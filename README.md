@@ -1,53 +1,64 @@
 # 🎭 Event Seatmap Platform
 
-A full-featured **event ticketing and seatmap management platform** built with **Angular**, **Spring Boot**, and **Java** as part of the **TU Wien – Software Engineering & Project (SEPR)** course.
+A full-featured **event ticketing and dynamic seatmap management platform** built with **Angular**, **Spring Boot**, and **Java** as part of the **TU Wien – Software Engineering & Project (SEPR)** course.
 
-The system combines a dynamic seatmap generator, a complete event backend, and a flexible data model for tickets, locations, artists, pricing, and seating.
+This project demonstrates full-stack engineering skills: complex algorithmic seatmap generation, REST backend architecture, Angular component design, database modeling, and clean CI-ready project structure.
 
 ---
 
-## 🎨 UI Preview
+## 📸 Showcase
 
-![Seatmap Overview](docs/images/seatmap-variant1.png)
-![Event Page](docs/images/event-page.png)
+### 🔐 Login Screen
+![Login](./Login.png)
+
+### 🏟 Main Event View
+![Main](./main.png)
+
+### 🪑 Seatmap Overview
+![Seatmap](./seatmap.png)
+
+### 🎯 Selected Seats Example
+![Seat Chosen](./seatmap_chosen.png)
+
+---
 
 ## 🚀 Features
 
 ### 🪑 Dynamic Seatmaps
 - 4 predefined seatmap variants (theatre, concert hall, center stage, trapezoid)
-- Fixed column numbering → removing seats never shifts the layout
-- Supports:
-  - Stage placement (TOP, BOTTOM, CENTER)
-  - Custom rectangular stage boxes
-  - Catwalks / T-shaped stages
-  - Blocked rows & columns
-  - Aisles and custom gaps per row
+- Fixed seat-numbering → removing seats never shifts the structure
+- Advanced layout support:
+  - TOP / BOTTOM / CENTER stages  
+  - Rectangular stage boxes  
+  - Catwalk (T-shape) support  
+  - Blocked rows & columns  
+  - Custom aisles and gaps per row  
 
 ### 🎟 Ticket & Event Management
 - Events automatically inherit the seatmap of their assigned location
-- Dynamic generation of:
+- Backend auto-generates:
   - Tickets  
   - Reservations  
   - Invoices  
-- Price logic based on location & sector
-- Artists supported (bands or individuals)
+- Price logic based on seat category
+- Support for artists, bands, and multiple event types
 
 ### 🏟 Location System
-Each location contains:
-- Stage + StageBox coordinates  
-- Sectors (A, B, C, Standing)  
-- Pricing categories  
-- Fully generated seating layout  
+Each location contains its own:
+- Stage configuration (position + dimensions)
+- Sectors (A, B, C, Standing)
+- Price categories
+- Fully auto-generated seats
 
 ### 🌱 Backend Data Generator
-The DataGenerator automatically creates:
-- Users  
-- Locations + sectors + seats  
-- Events (with images)  
-- Tickets & reservations  
-- Artists (bands + members)  
-- Merchandise  
-- News items  
+The DataGenerator creates:
+- Users
+- Locations + sectors + seats
+- Detailed seatmaps per location
+- Events with dates, types & artists
+- Tickets, reservations & invoices
+- Merchandise items
+- News feed entries
 
 ---
 
@@ -63,12 +74,21 @@ The DataGenerator automatically creates:
 - **Spring Boot 3**
 - Java 21
 - Spring Security
-- JPA / Hibernate
-- REST API (JSON)
+- Hibernate / JPA
+- REST API
 
 ### Database
-- H2 (dev mode)
-- Full JPA model for events, seats, sectors, price categories, tickets, etc.
+- **H2** (development)
+- JPA model for:
+  - Events
+  - Locations
+  - Sectors
+  - Seats
+  - Tickets
+  - Artists
+  - Price categories
+  - Merchandise
+  - Invoices & reservations
 
 ---
 
