@@ -1,0 +1,93 @@
+<div class="container mt-4">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h1 class="text-center mb-4 display-4">Meine Merchandise-Rechnungen</h1>
+
+    <button
+      type="button"
+      class="btn btn-outline-black btn-sm"
+      (click)="reloadMerchandiseInvoices()"
+      [disabled]="merchInvoicesLoading">
+      Aktualisieren
+    </button>
+  </div>
+
+  <p class="text-muted mb-3">
+    Hier sehen Sie Ihre bereits bestellten Merchandise-Rechnungen. Sie können einzelne oder mehrere PDFs öffnen.
+  </p>
+
+  <!-- Loading -->
+  @if (merchInvoicesLoading) {
+    <div class="alert alert-info">Lade Rechnungen...</div>
+  }
+
+  <!-- Error -->
+  @if (merchInvoicesError) {
+    <div class="alert alert-danger">{{ merchInvoicesError }}</div>
+  }
+
+  <!-- Keine Rechnungen -->
+  @if (!merchInvoicesLoading && !merchInvoicesError && merchInvoices.length === 0) {
+    <div class="alert alert-info">
+      Sie haben noch keine Merchandise-Bestellungen.
+    </div>
+  }
+
+  <!-- Rechnungen -->
+  @if (!merchInvoicesLoading && !merchInvoicesError && merchInvoices.length > 0) {
+
+    <h2>Merchandise-Rechnungen</h2>
+
+    <div class="tickets-list d-flex flex-column gap-4">
+
+      @for (inv of merchInvoices; track inv.id) {
+        <div class="ticket-wrapper d-flex align-items-center">
+
+          <!-- KARTE -->
+          <div class="ticket-card flex-grow-1 me-3">
+
+            <div class="ticket-top bg-dark text-white p-2">
+              Rechnung {{ inv.invoiceNumber }}
+            </div>
+
+            <div class="ticket-body p-3">
+
+              @if (parseInvoiceDate(inv.invoiceNumber); as d) {
+                <div>Bestellt am {{ d | date:'dd.MM.yyyy HH:mm' }}</div>
+              }
+
+              <div class="text-muted small">
+                Rechnungs-ID: {{ inv.id }}
+              </div>
+
+            </div>
+          </div>
+
+          <!-- CHECKBOX -->
+          <div class="ticket-select ms-2">
+            <input
+              type="checkbox"
+              [checked]="selectedInvoiceIds.has(inv.id)"
+              (change)="toggleInvoiceSelection(inv.id, $any($event.target).checked)"
+              aria-label="Rechnung auswählen"
+            />
+          </div>
+
+        </div>
+      }
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="ticket-actions mt-3 d-flex justify-content-start gap-2">
+      <button
+        class="btn btn-black"
+        (click)="openSelectedInvoices()"
+        [disabled]="selectedInvoiceIds.size === 0 || merchInvoicesLoading">
+        Ausgewählte Rechnungen herunterladen
+      </button>
+    </div>
+  }
+
+</div>

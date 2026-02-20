@@ -1,0 +1,130 @@
+<div class="seatmap-container">
+  <h2>Saalplan</h2>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-box cat-free"></span> Stehplatz</div>
+    <div class="legend-item"><span class="legend-box cat-cheap"></span> Günstiger Platz</div>
+    <div class="legend-item"><span class="legend-box cat-middle"></span> Standard Platz</div>
+    <div class="legend-item"><span class="legend-box cat-expensive"></span> Premium Platz</div>
+    <div class="legend-item"><span class="legend-box status-sold"></span> Besetzt</div>
+  </div>
+
+  <div data-cy="seatmap"></div>
+
+  <div class="selection-info" data-cy="selection-info">
+    Ausgewählte Plätze:
+    <span data-cy="selected-count">{{ selectedSeats.size }}</span>
+  </div>
+
+  <div *ngIf="!useGrid" class="seatmap-layout">
+    <div class="stage-wrap" *ngIf="!hasStageBox && stagePosition === 'TOP'">
+      <div class="stage stage-main"
+           [style.height.px]="stageHeightPx ?? 180"
+           [style.width.px]="stageWidthPx ?? 700">
+        {{ stageLabel }}
+      </div>
+
+      <div *ngIf="runwayLengthPx"
+           class="stage stage-runway"
+           [style.height.px]="runwayLengthPx"
+           [style.width.px]="runwayWidthPx ?? 140"
+           [style.transform]="'translateX(calc(-50% + ' + (runwayOffsetPx ?? 0) + 'px))'">
+      </div>
+    </div>
+
+    <div class="rows">
+      <div class="row" *ngFor="let row of rows">
+        <div class="seats">
+          <ng-container *ngFor="let seat of row">
+            <div *ngIf="!seat" class="seat empty"></div>
+
+            <button *ngIf="seat"
+                    type="button"
+                    class="seat"
+                    data-cy="seat"
+                    [disabled]="seat.status === 'sold' || seat.status === 'reserved'"
+                    [attr.data-row]="seat.row"
+                    [attr.data-number]="seat.number"
+                    [attr.data-seat-id]="seat.id"
+                    [attr.data-status]="seat.status"
+                    [attr.data-cat]="seat.priceCategory"
+                    [ngClass]="['cat-' + seat.priceCategory, 'status-' + seat.status]"
+                    [title]="seatTooltip(seat)"
+                    (click)="toggleSeat(seat)">
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-wrap" *ngIf="!hasStageBox && stagePosition !== 'TOP'">
+      <div class="stage stage-main"
+           [style.height.px]="stageHeightPx ?? 180"
+           [style.width.px]="stageWidthPx ?? 700">
+        {{ stageLabel }}
+      </div>
+
+      <div *ngIf="runwayLengthPx"
+           class="stage stage-runway"
+           [style.height.px]="runwayLengthPx"
+           [style.width.px]="runwayWidthPx ?? 140"
+           [style.transform]="'translateX(calc(-50% + ' + (runwayOffsetPx ?? 0) + 'px))'">
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ MERGE: Wrapper + seat-grid Klasse aus ALT wieder rein -->
+  <div *ngIf="useGrid" class="seat-grid-scroll">
+    <div class="seat-grid" [style.--cols]="colsCount">
+
+      <div *ngIf="hasStageBox"
+           class="stage stage--overlay"
+           [ngStyle]="stageOverlayStyle()">
+        {{ stageLabel }}
+      </div>
+
+      <ng-container *ngFor="let cell of cells">
+        <div *ngIf="!cell" class="seat empty"></div>
+
+        <button *ngIf="cell"
+                type="button"
+                class="seat"
+                data-cy="seat"
+                [attr.data-row]="cell.row"
+                [attr.data-number]="cell.number"
+                [attr.data-seat-id]="cell.id"
+                [attr.data-status]="cell.status"
+                [attr.data-cat]="cell.priceCategory"
+                [ngClass]="['cat-' + cell.priceCategory, 'status-' + cell.status]"
+                [title]="seatTooltip(cell)"
+                (click)="toggleSeat(cell)">
+        </button>
+      </ng-container>
+
+    </div>
+  </div>
+
+  <div class="seatmap-footer">
+    <div class="seatmap-actions">
+      <ng-container *ngIf="!isAdmin()">
+        <button class="btn btn-outline-black"
+                data-cy="reserve"
+                [disabled]="selectedSeats.size === 0"
+                (click)="onReserve()">
+          Reservieren
+        </button>
+
+        <button class="btn btn-black"
+                data-cy="continue"
+                [disabled]="selectedSeats.size === 0"
+                (click)="onAddToCart()">
+          In den Warenkorb
+        </button>
+      </ng-container>
+
+      <div *ngIf="isAdmin()" class="admin-notice">
+        <p>Administratoren können keine Tickets buchen oder reservieren.</p>
+      </div>
+    </div>
+  </div>
+</div>

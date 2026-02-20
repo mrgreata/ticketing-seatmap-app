@@ -1,0 +1,48 @@
+<div class="reset-password-container">
+  <h2>Passwort zurücksetzen</h2>
+
+  <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <input
+        id="password"
+        type="password"
+        class="form-control"
+        formControlName="password"
+        placeholder="Neues Passwort"
+      />
+
+      <div
+        class="error"
+        *ngIf="resetForm.get('password')?.touched
+            && resetForm.get('password')?.invalid">
+        Passwort muss mindestens 8 Zeichen lang sein
+      </div>
+    </div>
+
+    <div class="form-group">
+      <input
+        id="confirmPassword"
+        type="password"
+        class="form-control"
+        formControlName="confirmPassword"
+        placeholder="Neues Passwort bestätigen"
+      />
+
+      <div
+        class="error"
+        *ngIf="resetForm.hasError('passwordMismatch')
+            && resetForm.get('confirmPassword')?.touched">
+        Passwörter stimmen nicht überein
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-dark w-100"
+      [disabled]="resetForm.invalid || loading">
+      Passwort zurücksetzen
+    </button>
+
+  </form>
+</div>

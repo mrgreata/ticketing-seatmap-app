@@ -1,0 +1,138 @@
+
+.merch-detail-page {
+  background: transparent;
+  min-height: calc(100vh - 56px);
+  padding-bottom: 2rem;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 520px minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.detail-grid > div {
+  min-width: 0;
+}
+
+.merch-detail-title,
+.merch-detail-description {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.merch-detail-image-card {
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fdfdfd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.merch-detail-image-wrapper {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.merch-detail-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.merch-detail-image-placeholder {
+  width: 100%;
+  height: 100%;
+  color: #777;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.merch-detail-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.merch-detail-description {
+  color: #555;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.merch-detail-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.detail-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.quantity-group {
+  width: 120px;
+}
+
+.btn-event-primary {
+  background-color: #C0D3DF;
+  color: #000;
+  border: none;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 14px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-event-primary:hover {
+  background-color: #a8c1d1;
+  color: #000;
+}
+
+.btn-event-primary:disabled {
+  background-color: #e3e8ec;
+  color: #777;
+  cursor: not-allowed;
+}
+
+@media (max-width: 992px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .merch-detail-image-card {
+    max-width: 720px;
+  }
+}
+
+.admin-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

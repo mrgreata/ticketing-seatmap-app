@@ -1,0 +1,29 @@
+/* --- Main Header --- */
+.main-header {
+  background-color: #fff;
+  position: fixed;              // ← FIXED statt sticky
+  top: 0;
+  left: 0;                      // ← NEU
+  right: 0;                     // ← NEU
+  width: 100%;                  // ← NEU
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  .logo h4 {
+    margin: 0;
+  }
+
+  .nav-link {
+    cursor: pointer;
+    color: black;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  button.btn-dark {
+    margin-left: 10px;
+  }
+}

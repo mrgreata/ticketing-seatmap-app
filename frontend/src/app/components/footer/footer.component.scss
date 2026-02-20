@@ -1,0 +1,33 @@
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #333;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.footer-left {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.footer-right {
+  display: flex;
+  gap: 1.5rem;
+
+  i {
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #667eea;
+    }
+  }
+}

@@ -1,0 +1,183 @@
+<div class="profile-update-container">
+
+  <div class="profile-title">Profil bearbeiten</div>
+
+  @if (loading) {
+    <div class="loading-spinner">Lade Profil...</div>
+  }
+
+  @if (!loading && user) {
+    <div class="profile-update-content">
+
+      <div class="profile-update-box">
+        <div class="section-title">Persönliche Daten</div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()">
+
+          <div class="form-group">
+            <label for="email" class="form-label">E-Mail *</label>
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-control"
+              placeholder="ihre.email@example.com"
+              [class.is-invalid]="profileForm.controls.email.invalid && profileForm.controls.email.touched">
+
+            @if (profileForm.controls.email.touched && profileForm.controls.email.errors) {
+              <small class="text-danger">
+                @if (profileForm.controls.email.errors.required) {
+                  E-Mail ist erforderlich.
+                }
+                @if (profileForm.controls.email.errors.email) {
+                  Bitte geben Sie eine gültige E-Mail-Adresse ein.
+                }
+                @if (profileForm.controls.email.errors.maxlength) {
+                  E-Mail darf maximal 255 Zeichen haben.
+                }
+              </small>
+            }
+
+            @if (user && profileForm.value.email !== user.email) {
+              <small class="text-warning d-block mt-1">
+                Achtung: Bei Änderung der E-Mail müssen Sie sich zukünftig mit der neuen E-Mail anmelden.
+              </small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="firstName" class="form-label">Vorname *</label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              class="form-control"
+              placeholder="Max"
+              [class.is-invalid]="profileForm.controls.firstName.invalid && profileForm.controls.firstName.touched">
+
+            @if (profileForm.controls.firstName.touched && profileForm.controls.firstName.errors) {
+              <small class="text-danger">
+                @if (profileForm.controls.firstName.errors.required) {
+                  Vorname ist erforderlich.
+                }
+                @if (profileForm.controls.firstName.errors.maxlength) {
+                  Vorname darf maximal 255 Zeichen haben.
+                }
+              </small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="lastName" class="form-label">Nachname *</label>
+            <input
+              type="text"
+              id="lastName"
+              formControlName="lastName"
+              class="form-control"
+              placeholder="Mustermann"
+              [class.is-invalid]="profileForm.controls.lastName.invalid && profileForm.controls.lastName.touched">
+
+            @if (profileForm.controls.lastName.touched && profileForm.controls.lastName.errors) {
+              <small class="text-danger">
+                @if (profileForm.controls.lastName.errors.required) {
+                  Nachname ist erforderlich.
+                }
+                @if (profileForm.controls.lastName.errors.maxlength) {
+                  Nachname darf maximal 255 Zeichen haben.
+                }
+              </small>
+            }
+          </div>
+
+
+          <div class="form-group">
+            <label class="form-label">Adresse</label>
+
+            <input class="form-control mb-2" placeholder="Straße" formControlName="street" maxlength="255">
+
+            <div class="d-flex gap-2 mb-2">
+              <input class="form-control" placeholder="Hausnummer" formControlName="houseNumber" maxlength="3">
+              <input class="form-control" placeholder="Stiege (optional)" formControlName="stair" maxlength="3">
+              <input class="form-control" placeholder="Tür (optional)" formControlName="door" maxlength="3">
+            </div>
+
+            <div class="d-flex gap-2">
+              <input class="form-control" placeholder="PLZ" formControlName="postalCode" maxlength="4">
+              <input class="form-control" placeholder="Stadt" formControlName="city" maxlength="255">
+            </div>
+
+            <div class="form-text mt-2">
+              Vorschau: <strong>{{ buildAddress() }}</strong>
+            </div>
+
+            <div class="text-muted small">
+              {{ getAddressLength() }}/255 Zeichen
+            </div>
+
+            @if (profileForm.hasError('addressTooLong')) {
+              <small class="text-danger d-block mt-1">
+                Die Adresse ist zu lang ({{ profileForm.errors?.['addressTooLong']?.length }} Zeichen).
+                Maximale Länge: {{ profileForm.errors?.['addressTooLong']?.max }} Zeichen.
+              </small>
+            }
+          </div>
+
+          <div class="button-group">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="cancel()"
+              [disabled]="isSubmitting">
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              class="btn btn-dark"
+              [disabled]="profileForm.invalid || isSubmitting || profileForm.hasError('addressTooLong')">
+              @if (profileLoading) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              }
+              Änderungen speichern
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  }
+</div>
+
+<div class="modal fade" id="emailChangeModal" tabindex="-1" aria-labelledby="emailChangeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="emailChangeModalLabel">E-Mail-Adresse ändern</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Sie ändern Ihre E-Mail-Adresse von:</p>
+        <p class="text-center"><strong>{{ oldEmail }}</strong></p>
+        <p>zu:</p>
+        <p class="text-center"><strong>{{ newEmail }}</strong></p>
+        <p class="text-warning"><strong>Wichtige Information:</strong></p>
+        <ul>
+          <li>Sie werden nach der Änderung automatisch <strong>abgemeldet</strong></li>
+          <li>Sie müssen sich zukünftig mit der neuen E-Mail anmelden</li>
+          <li>Bestätigungs-E-Mails werden an die neue Adresse gesendet</li>
+          <li>Ihre bestehenden Prämienpunkte bleiben erhalten</li>
+        </ul>
+        <p>Möchten Sie fortfahren?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+        <button
+          type="button"
+          class="btn btn-warning"
+          (click)="confirmEmailChange()"
+          data-bs-dismiss="modal">
+          Ja, E-Mail ändern & abmelden
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

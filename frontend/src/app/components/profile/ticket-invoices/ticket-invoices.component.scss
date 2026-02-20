@@ -1,0 +1,73 @@
+.table-responsive {
+  margin-top: 0.5rem;
+}
+.ticket-card {
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+
+  .ticket-top {
+    padding: 0.5rem 1rem;
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .ticket-body {
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    .text-muted {
+      font-size: 0.85rem;
+      color: #666;
+    }
+  }
+}.ticket-select {
+   display: flex;
+   align-items: center;
+ }
+
+.ticket-select input[type="checkbox"] {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid black;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticket-select input[type="checkbox"]:checked {
+  background: black;
+}
+
+.ticket-select input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.btn-black {
+  background: black;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.btn-outline-black {
+  background: transparent;
+  border: 1px solid black;
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}

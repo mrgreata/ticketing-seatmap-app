@@ -1,0 +1,221 @@
+<main class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h2 mb-1">Neuen Merchandise-Artikel erstellen</h1>
+          <p class="text-muted mb-0">Erstellen Sie einen neuen Artikel für die Ticketline-Plattform</p>
+        </div>
+        <button (click)="goBack()" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Zurück
+        </button>
+      </div>
+
+      @if (!isAdmin) {
+        <div class="alert alert-danger">
+          Nur Administratoren können Merchandise anlegen.
+        </div>
+      } @else {
+
+        <form (ngSubmit)="onSubmit()" #f="ngForm" [class.submitting]="isLoading">
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              Name <span class="text-danger">*</span>
+            </label>
+            <input
+              class="form-control form-control-lg"
+              name="name"
+              [(ngModel)]="merch.name"
+              required
+              maxlength="50"
+              placeholder="z.B. T-Shirt Ticketline"
+              [disabled]="isLoading"
+            />
+            @if (f.submitted || (f.controls['name']?.touched)) {
+              @if (!merch.name?.trim()) {
+                <small class="text-danger">Name ist erforderlich.</small>
+              }
+            }
+            <div class="form-text">
+              {{ merch.name?.length || 0 }}/50 Zeichen
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              Beschreibung <span class="text-danger">*</span>
+            </label>
+            <textarea
+              class="form-control"
+              name="description"
+              [(ngModel)]="merch.description"
+              required
+              maxlength="250"
+              rows="6"
+              placeholder="Beschreiben Sie den Artikel..."
+              [disabled]="isLoading"
+            ></textarea>
+            @if (f.submitted || (f.controls['description']?.touched)) {
+              @if (!merch.description?.trim()) {
+                <small class="text-danger">Beschreibung ist erforderlich.</small>
+              }
+            }
+            <div class="form-text">
+              {{ merch.description?.length || 0 }}/250 Zeichen
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                Preis (€) <span class="text-danger">*</span>
+              </label>
+              <input
+                class="form-control"
+                type="text"
+                name="unitPrice"
+                [(ngModel)]="merch.unitPrice"
+                required
+                inputmode="decimal"
+                placeholder="z.B. 999,99"
+                (keypress)="onlyPriceChars($event)"
+                oninput="
+                  this.value=this.value.replace(/[^0-9.,]/g,'');
+                  const v=this.value.replace('.',',');
+                  const parts=v.split(',');
+                  const intPart=(parts[0]||'').slice(0,7);
+                  const fracPart=(parts[1]||'').slice(0,2);
+                  this.value = parts.length>1 ? (intPart + ',' + fracPart) : intPart;
+                  s"
+              />
+              <div class="form-text">Max. 7 Stellen vor dem Komma, 2 nach dem Komma.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                Verfügbare Menge <span class="text-danger">*</span>
+              </label>
+              <input
+                class="form-control"
+                type="number"
+                name="remainingQuantity"
+                [(ngModel)]="merch.remainingQuantity"
+                required
+                min="0"
+                max="9999999"
+                step="1"
+                placeholder="z.B. 100"
+                (keypress)="onlyNumbers($event)"
+                oninput="if(this.value.length > 7) this.value = this.value.slice(0, 7);"
+              />
+              <div class="form-text">Max. 7 Stellen.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                Prämienpunkte / Stück <span class="text-danger">*</span>
+              </label>
+              <input
+                class="form-control"
+                type="number"
+                name="rewardPointsPerUnit"
+                [(ngModel)]="merch.rewardPointsPerUnit"
+                required
+                min="0"
+                max="9999999"
+                step="1"
+                placeholder="z.B. 100"
+                (keypress)="onlyNumbers($event)"
+                oninput="if(this.value.length > 7) this.value = this.value.slice(0, 7);"
+              />
+              <div class="form-text">Max. 7 Stellen.</div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              Bild (optional)
+            </label>
+
+            <input
+              id="merchImage"
+              class="form-control"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              (change)="onFileSelected($event)"
+              [disabled]="isLoading"
+            />
+
+            <div class="form-text">
+              Unterstützte Formate: JPG, PNG, WebP (max. 3 MB)
+            </div>
+
+            @if (previewUrl) {
+              <div class="image-preview-container">
+                <p class="text-success small mb-2">
+                  <i class="bi bi-check-circle"></i> Ausgewähltes Bild:
+                </p>
+                <div class="image-preview-box preview-new">
+                  <img [src]="previewUrl" alt="Bild-Vorschau" class="preview-image" />
+                  <button type="button" class="btn-remove" (click)="removeImage()" title="Entfernen" [disabled]="isLoading">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="redeemable"
+                name="redeemableWithPoints"
+                [(ngModel)]="merch.redeemableWithPoints"
+                [disabled]="isLoading"
+              />
+              <label class="form-check-label" for="redeemable">
+                Mit Punkten einlösbar
+              </label>
+            </div>
+          </div>
+
+          @if (merch.redeemableWithPoints) {
+            <div class="mb-4">
+              <label class="form-label fw-bold">Punktepreis</label>
+              <input
+                class="form-control"
+                type="number"
+                name="pointsPrice"
+                [(ngModel)]="merch.pointsPrice"
+                min="0"
+                max="9999999"
+                step="1"
+                placeholder="z.B. 100"
+                (keypress)="onlyNumbers($event)"
+                oninput="if(this.value.length > 7) this.value = this.value.slice(0, 7);"
+              />
+              <div class="form-text">Max. 7 Stellen.</div>
+            </div>
+          }
+
+          <div class="d-flex justify-content-end mt-5 pt-3 border-top">
+            <button class="btn btn-primary" type="submit" [disabled]="isLoading || !f.valid">
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Wird erstellt...
+              </span>
+              <span *ngIf="!isLoading">
+                <i class="bi bi-plus-circle"></i> Artikel erstellen
+              </span>
+            </button>
+          </div>
+
+        </form>
+      }
+    </div>
+  </div>
+</main>

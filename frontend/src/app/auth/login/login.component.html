@@ -1,0 +1,59 @@
+<div class="login-container">
+
+  <div class="login-title">Login</div>
+
+  <div class="login-box">
+
+    <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
+
+      <div class="form-group">
+        <input
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="E-Mail-Adresse">
+
+        @if (loginForm.controls.email.touched && loginForm.controls.email.errors) {
+          <small class="text-danger">
+            E-Mail-Adresse ist erforderlich.
+          </small>
+        }
+      </div>
+
+      <div class="form-group">
+        <input
+          type="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Passwort">
+
+        @if (loginForm.controls.password.touched && loginForm.controls.password.errors) {
+          <small class="text-danger">
+            @if (loginForm.controls.password.errors.required) {
+              Passwort ist erforderlich.
+            }
+            @if (loginForm.controls.password.errors.minlength) {
+              Das Passwort muss mindestens 8 Zeichen lang sein.
+            }
+          </small>
+        }
+      </div>
+
+      <div class="forgot-password">
+        <a routerLink="/password-reset/request">
+          Passwort vergessen?
+        </a>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-dark login-button"
+        [disabled]="loginForm.invalid">
+        LOGIN
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

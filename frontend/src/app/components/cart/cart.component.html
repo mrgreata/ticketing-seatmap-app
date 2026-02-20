@@ -1,0 +1,211 @@
+<div class="container cart-page mt-4">
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="mb-0">Warenkorb</h2>
+  </div>
+
+  <div *ngIf="loading" class="alert alert-info">Lade Warenkorb...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error">
+
+    <div class="row g-4">
+
+      <div class="col-12 col-lg-8">
+
+        <div *ngIf="isEmpty" class="alert alert-warning">
+          Dein Warenkorb ist leer.
+        </div>
+
+        <div class="vstack gap-3" *ngIf="!isEmpty">
+
+          <div
+            class="card cart-item-card"
+            *ngFor="let item of cart?.items; trackBy: trackByCartItemId"
+          >
+            <div class="card-body">
+              <div class="d-flex gap-3 align-items-start">
+
+                <div class="item-image">
+                  <ng-container *ngIf="item.type === 'TICKET'; else merchLikeImage">
+                    <img
+                      *ngIf="getEventImageUrl(item); else ticketPlaceholder"
+                      [src]="getEventImageUrl(item)!"
+                      alt="Event"
+                      (error)="item.eventId = null"
+                    />
+                    <ng-template #ticketPlaceholder>
+                      <div class="placeholder-box dark">Ticket</div>
+                    </ng-template>
+                  </ng-container>
+
+                  <ng-template #merchLikeImage>
+                    <img
+                      *ngIf="getMerchImageUrl(item); else merchPlaceholder"
+                      [src]="getMerchImageUrl(item)!"
+                      alt="Merchandise"
+                      (error)="item.merchandiseId = null"
+                    />
+                    <ng-template #merchPlaceholder>
+                      <div class="placeholder-box">Merch</div>
+                    </ng-template>
+                  </ng-template>
+                </div>
+
+                <div class="flex-grow-1">
+
+                  <div class="d-flex justify-content-between gap-3">
+                    <div>
+                      <div class="item-title">
+                        <span
+                          class="badge me-2"
+                          [ngClass]="
+                            item.type === 'TICKET'
+                              ? 'text-bg-dark'
+                              : (item.type === 'REWARD'
+                                  ? 'text-bg-warning'
+                                  : 'text-bg-secondary')
+                          "
+                        >
+                          <ng-container *ngIf="item.type === 'TICKET'; else merchBadge">
+                            Ticket
+                          </ng-container>
+                          <ng-template #merchBadge>
+                            {{ item.type === 'REWARD' ? 'Prämie' : 'Merch' }}
+                          </ng-template>
+                        </span>
+
+                        <span class="item-title-text">
+                          <ng-container *ngIf="item.type === 'TICKET'; else merchTitle">
+                            {{ item.eventTitle }}
+                          </ng-container>
+                          <ng-template #merchTitle>
+                            {{ item.name }}
+                          </ng-template>
+                        </span>
+                      </div>
+
+                      <div class="item-meta" *ngIf="item.type !== 'TICKET'">
+                        Verfügbar: {{ item.remainingQuantity }}
+                        <span *ngIf="item.type === 'REWARD'" class="text-muted ms-2">
+                          (wird mit Punkten abgerechnet)
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-danger"
+                      (click)="remove(item)"
+                      data-bs-toggle="modal"
+                      data-bs-target="#remove-cart-item"
+                    >
+                      Entfernen
+                    </button>
+                  </div>
+
+                  <div class="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-3">
+
+                    <ng-container *ngIf="item.type !== 'TICKET'; else ticketControls">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted small">Menge</span>
+
+                        <select
+                          class="form-select form-select-sm qty-select"
+                          [ngModel]="item.quantity"
+                          (ngModelChange)="onMerchQtyChange(item, $event)"
+                        >
+                          <option *ngFor="let q of getMerchQtyOptions(item)" [ngValue]="q">
+                            {{ q }}
+                          </option>
+                        </select>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #ticketControls>
+                      <div class="text-muted small">
+                        Anzahl: <span class="fw-semibold">{{ item.ticketCount }}</span>
+                      </div>
+                    </ng-template>
+
+                    <div class="text-end">
+                      <div class="item-price">
+
+                        <ng-container *ngIf="item.type === 'REWARD'">
+                          0,00 €
+                        </ng-container>
+
+                        <ng-container *ngIf="item.type === 'MERCHANDISE'">
+                          {{ (item.unitPrice ?? 0) * (item.quantity ?? 0) | number:'1.2-2' }} €
+                        </ng-container>
+
+                        <ng-container *ngIf="item.type === 'TICKET'">
+                          <ng-container *ngIf="item.unitPrice !== null; else noTicketPrice">
+                            {{ item.unitPrice | number:'1.2-2' }} €
+                          </ng-container>
+                          <ng-template #noTicketPrice>–</ng-template>
+                        </ng-container>
+
+                      </div>
+                      <div class="text-muted small">Zwischensumme</div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+
+        <div class="card summary-card position-sticky" *ngIf="!isEmpty">
+          <div class="card-body">
+            <h5 class="mb-3">Zusammenfassung</h5>
+
+            <div class="summary-line">
+              <span>Artikel</span>
+              <span>{{ cart?.items?.length ?? 0 }}</span>
+            </div>
+
+            <hr/>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="fw-semibold">Gesamt</div>
+              <div class="summary-total">
+                {{ cart?.total ?? 0 | number:'1.2-2' }} €
+              </div>
+            </div>
+
+            <button
+              class="btn btn-event-primary btn-sm"
+              (click)="checkout()"
+              [disabled]="!cart?.items?.length"
+            >
+              Zur Kassa
+            </button>
+
+            <div class="text-muted small mt-2">
+              Steuern sind im Gesamtpreis enthalten.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<app-confirm-dialog
+  *ngIf="selectedForRemoval"
+  id="remove-cart-item"
+  title="Artikel entfernen"
+  [message]="'Möchten Sie &quot;' + getCartItemLabel(selectedForRemoval) + '&quot; wirklich aus dem Warenkorb entfernen?'"
+  confirmText="Ja, entfernen"
+  cancelText="Abbrechen"
+  confirmButtonClass="btn-danger"
+  (confirm)="confirmRemoveSelectedCartItem()">
+</app-confirm-dialog>

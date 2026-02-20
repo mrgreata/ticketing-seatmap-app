@@ -1,0 +1,109 @@
+<!-- MAIN HEADER  -->
+<header class="main-header d-flex justify-content-between align-items-center p-3">
+  <div class="logo" routerLink="/" style="cursor: pointer;">
+    <h4><b>Ticketline 4.0</b></h4>
+  </div>
+
+  <nav class="d-flex gap-3 align-items-center">
+    <!-- alway visible (no matter if logged in or not)-->
+    <span class="nav-link" routerLink="/news/home">News</span>
+    <span class="nav-link" routerLink="/events">Veranstaltungen</span>
+
+    <!-- TICKETS: only normal users -->
+    @if (isLoggedIn() && !isAdmin()) {
+      <span class="nav-link" routerLink="/tickets/my">Tickets</span>
+    }
+
+    <!-- MERCHANDISE: users + admins -->
+    @if (isLoggedIn()) {
+      <span class="nav-link" routerLink="/merchandise">Merchandise</span>
+    }
+
+    <!-- ADMIN TOOLS -->
+    @if (isAdmin()) {
+      <div ngbDropdown class="d-inline-block">
+        <button
+          class="btn btn-outline-dark dropdown-toggle"
+          ngbDropdownToggle>
+          Admin
+        </button>
+
+        <div ngbDropdownMenu class="dropdown-menu-end">
+          <!-- User Management -->
+          <a ngbDropdownItem routerLink="/admin/users/creation">
+            Benutzer anlegen
+          </a>
+          <a ngbDropdownItem routerLink="/admin/user-management">
+            Benutzerverwaltung
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <!-- Content Management -->
+          <a ngbDropdownItem routerLink="/admin/news/creation">
+            News erstellen
+          </a>
+          <a ngbDropdownItem routerLink="/events/new">
+            Veranstaltung erstellen
+          </a>
+          <a ngbDropdownItem routerLink="/admin/merchandise/creation">
+            Merchandise erstellen
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <!-- Profile -->
+          <a ngbDropdownItem routerLink="/profile">
+            Profil anzeigen
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- CART (only visible if logged in and not admin) -->
+    @if (isLoggedIn() && !isAdmin()) {
+      <button class="btn btn-outline-dark" routerLink="/cart" aria-label="Warenkorb">
+        <i class="bi bi-cart3"></i>
+      </button>
+    }
+
+    <!-- PROFILE (only visible if logged in and not admin) -->
+    @if (isLoggedIn() && !isAdmin()) {
+      <div ngbDropdown class="d-inline-block">
+        <button
+          class="btn btn-outline-dark dropdown-toggle"
+          ngbDropdownToggle>
+          Profil
+        </button>
+
+        <div ngbDropdownMenu class="dropdown-menu-end">
+          <a ngbDropdownItem routerLink="/profile">
+            Profil anzeigen
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <a ngbDropdownItem routerLink="/profile/ticket-invoices">
+            Ticket-Rechnungen anzeigen
+          </a>
+
+          <a ngbDropdownItem routerLink="/profile/merchandise-invoices">
+            Merchandise-Rechnungen anzeigen
+          </a>
+        </div>
+      </div>
+    }
+
+    <!-- AUTH ACTIONS -->
+    @if (isLoggedIn()) {
+      <button class="btn btn-dark" (click)="logout()">Logout</button>
+    }
+
+    @if (!isLoggedIn()) {
+      <button class="btn btn-outline-dark" routerLink="/registration">
+        Registrieren
+      </button>
+      <button class="btn btn-dark" routerLink="/login">Login</button>
+    }
+  </nav>
+</header>

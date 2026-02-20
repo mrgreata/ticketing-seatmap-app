@@ -1,0 +1,137 @@
+<div class="container mt-4">
+  <div class="text-center mb-4">
+    <h1 class="fw-bold mb-2">Merchandise</h1>
+
+    <a class="btn btn-outline-secondary btn-sm"
+       routerLink="/merchandise/rewards">
+      Nur Prämien anzeigen
+    </a>
+  </div>
+
+  <div class="search-mode-selector mb-4">
+    <div class="placeholder-left"></div>
+
+    <div></div>
+
+    <div class="placeholder-right">
+      <button
+        *ngIf="isAdmin"
+        class="btn-admin-create"
+        (click)="navigateToCreateMerchandise()">
+        <i class="bi bi-plus-circle"></i>
+        Merchandise erstellen
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isAdmin" class="alert alert-info mt-3">
+    Admins können keine Merchandise-Artikel kaufen oder Prämien einlösen.
+  </div>
+
+  <div *ngIf="loading">Lade...</div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+  <div *ngIf="!loading && merchandise.length > 0" class="merch-grid">
+    <div *ngFor="let m of merchandise; trackBy: trackByMerchId" class="merch-card card">
+
+      <a class="merch-link" [routerLink]="['/merchandise', m.id]">
+        <div class="merch-image-wrapper">
+          <ng-container *ngIf="m.hasImage; else noImage">
+            <img
+              [src]="getImageUrl(m.id)"
+              [alt]="m.name"
+              class="card-img-top merch-image"
+              (error)="onImageError(m)">
+          </ng-container>
+
+          <ng-template #noImage>
+            <div class="merch-image-placeholder">Kein Bild</div>
+          </ng-template>
+        </div>
+
+        <div class="card-body">
+          <h5 class="card-title merch-title">{{ m.name }}</h5>
+
+          <p class="card-text merch-description">
+            {{ m.description }}
+          </p>
+
+          <div class="merch-meta">
+            <span class="merch-price">
+              {{ m.unitPrice | number:'1.2-2' }} €
+            </span>
+            <span class="merch-stock"
+                  [ngClass]="{ 'sold-out': m.remainingQuantity === 0 }">
+              {{ m.remainingQuantity }} Stück verfügbar
+            </span>
+          </div>
+        </div>
+      </a>
+
+      <div class="card-body merch-actions">
+        <div class="quantity-group">
+          <label class="form-label form-label-sm mb-1">Menge</label>
+          <select
+            class="form-select form-select-sm"
+            [ngModel]="getQty(m)"
+            (ngModelChange)="setQty(m, $event)"
+            [disabled]="isAdmin || (m.remainingQuantity ?? 0) <= 0">
+            <option *ngFor="let q of getQtyOptions(m)" [ngValue]="q">{{ q }}</option>
+          </select>
+
+        </div>
+
+        <button
+          class="btn btn-event-primary btn-sm"
+          [disabled]="isAdmin || m.remainingQuantity <= 0 || isQuantityTooHigh(m)"
+          [class.admin-disabled]="isAdmin"
+          [attr.title]="isAdmin ? 'Admins können keine Artikel kaufen.' : null"
+          (click)="buy(m)">
+          Zum Warenkorb hinzufügen
+        </button>
+
+        <button
+          *ngIf="isAdmin"
+          type="button"
+          class="btn btn-outline-danger btn-sm"
+          (click)="selectedForDelete = m"
+          data-bs-toggle="modal"
+          data-bs-target="#delete-merchandise">
+          Löschen
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="hasMore" class="text-center my-4">
+    <button
+      class="btn-load-more"
+      type="button"
+      (click)="loadMore()"
+      [disabled]="isLoadingMore">
+      <span *ngIf="!isLoadingMore">Weitere Artikel laden</span>
+      <span *ngIf="isLoadingMore">
+      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+      Laden...
+    </span>
+    </button>
+  </div>
+
+  <p *ngIf="!loading && merchandise.length === 0">
+    Derzeit sind keine Merchandise-Artikel verfügbar.
+  </p>
+</div>
+
+<app-confirm-dialog
+  *ngIf="selectedForDelete"
+  id="delete-merchandise"
+  title="Merchandise löschen"
+  [message]="'Möchten Sie den Artikel \'' + selectedForDelete.name + '\' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+  confirmText="Ja, löschen"
+  cancelText="Abbrechen"
+  confirmButtonClass="btn-danger"
+  (confirm)="confirmDeleteSelectedMerchandise()">
+</app-confirm-dialog>

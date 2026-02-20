@@ -1,0 +1,143 @@
+<div class="container mt-4">
+  <div class="text-center mb-4">
+    <h1 class="fw-bold mb-2">Prämien</h1>
+
+    <a class="btn btn-outline-secondary btn-sm"
+       routerLink="/merchandise">
+      Alle Merchandise-Artikel anzeigen
+    </a>
+  </div>
+
+  @if (isAdmin) {
+    <div class="alert alert-info mt-3">
+      Admins können keine Merchandise-Artikel kaufen oder Prämien einlösen.
+    </div>
+  }
+
+  @if (rewardPoints !== undefined) {
+    <div class="points-banner mb-3">
+      Deine Prämienpunkte: <strong>{{ rewardPoints }}</strong>
+    </div>
+  }
+
+  @if (totalCentsSpent !== undefined && !isRegularCustomer) {
+    <div class="alert alert-info mb-3">
+      Sie sind noch kein Stammkunde.
+      Prämienpunkte erhalten Sie ab einem Gesamtumsatz von <strong>50,00 €</strong>.
+      <br>
+      Aktueller Umsatz:
+      <strong>{{ totalSpentEuro | number:'1.2-2' }} €</strong>
+      @if (missingEuroToRegular !== undefined && missingEuroToRegular > 0) {
+        — Es fehlen noch <strong>{{ missingEuroToRegular | number:'1.2-2' }} €</strong>.
+      }
+    </div>
+  }
+
+  @if (redeemSuccess) {
+    <div class="alert alert-success">{{ redeemSuccess }}</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <div>Lade...</div>
+  }
+
+  @if (!loading && rewards.length > 0) {
+    <div class="merch-grid">
+      @for (m of rewards; track m.id) {
+        <div class="merch-card card">
+
+          <a class="merch-link" [routerLink]="['/merchandise', m.id]">
+            <div class="merch-image-wrapper">
+              @if (m.hasImage) {
+                <img
+                  [src]="getImageUrl(m.id)"
+                  alt="{{ m.name }}"
+                  class="card-img-top merch-image"
+                  (error)="m.hasImage = false">
+              } @else {
+                <div class="merch-image-placeholder">
+                  Kein Bild
+                </div>
+              }
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title merch-title">{{ m.name }}</h5>
+
+              <p class="card-text merch-description">
+                {{ m.description }}
+              </p>
+
+              <div class="merch-meta">
+                <span class="reward-points">
+                  {{ m.pointsPrice }} Punkte
+                </span>
+              </div>
+            </div>
+          </a>
+
+          <div class="card-body merch-actions">
+            <button
+              type="button"
+              class="btn btn-event-primary btn-sm"
+              (click)="redeem(m)"
+              [disabled]="isAdmin
+                || rewardPoints === undefined
+                || !isRegularCustomer
+                || !m.redeemableWithPoints
+                || (m.remainingQuantity ?? 0) <= 0
+                || (m.pointsPrice ?? 0) <= 0
+                || rewardPoints < (m.pointsPrice ?? 0)">
+              Zum Warenkorb hinzufügen
+            </button>
+
+            @if (isAdmin) {
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                (click)="selectedForDelete = m"
+                data-bs-toggle="modal"
+                data-bs-target="#delete-merchandise">
+                Löschen
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div *ngIf="hasMore" class="text-center my-4">
+      <button
+        class="btn-load-more"
+        type="button"
+        (click)="loadMore()"
+        [disabled]="isLoadingMore">
+        <span *ngIf="!isLoadingMore">Weitere Artikel laden</span>
+        <span *ngIf="isLoadingMore">
+      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+      Laden...
+    </span>
+      </button>
+    </div>
+  }
+
+  @if (!loading && rewards.length === 0) {
+    <p>Derzeit sind keine Prämien verfügbar.</p>
+  }
+</div>
+
+
+<app-confirm-dialog
+  *ngIf="selectedForDelete"
+  id="delete-merchandise"
+  title="Merchandise löschen"
+  [message]="'Möchten Sie den Artikel \'' + selectedForDelete.name + '\' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+  confirmText="Ja, löschen"
+  cancelText="Abbrechen"
+  confirmButtonClass="btn-danger"
+  (confirm)="confirmDeleteSelectedMerchandise()">
+</app-confirm-dialog>

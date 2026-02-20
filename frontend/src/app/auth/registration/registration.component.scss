@@ -1,0 +1,74 @@
+
+/* --- Main area: registration container --- */
+.register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+
+  .register-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Centered box for the form */
+  .register-box {
+    width: 100%;
+    max-width: 550px;
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 8px;
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .form-control {
+        border-radius: 6px;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+
+        &:focus {
+          border-color: #000;
+          box-shadow: none;
+        }
+      }
+
+      .row {
+        display: flex;
+        gap: 1rem;
+
+        .col {
+          flex: 1;
+        }
+      }
+
+      /* Register button */
+      button[type="submit"] {
+        margin-top: 0.5rem;
+        padding: 0.75rem 1rem;
+        font-size: 1.1rem;
+        border-radius: 8px;
+      }
+    }
+  }
+}
+
+
+/* --- Responsive adjustments --- */
+@media (max-width: 600px) {
+  .register-box {
+    padding: 1.5rem !important;
+  }
+
+  .row {
+    flex-direction: column !important;
+
+    .col {
+      width: 100%;
+    }
+  }
+}

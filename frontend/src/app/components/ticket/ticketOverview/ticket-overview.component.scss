@@ -1,0 +1,226 @@
+/* ---------------- TICKET GROUP CARD (Event-Block) ---------------- */
+
+.ticket-group-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.ticket-group-card .ticket-top {
+  background: black;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  padding: 0.6rem 1rem;
+}
+
+.ticket-group-card .ticket-body {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+
+/* ---------------- SINGLE TICKET ROW ---------------- */
+
+.ticket-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ticket-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-fields,
+.ticket-data {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ticket-fields {
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.ticket-data {
+  font-weight: normal;
+}
+
+.field {
+  flex: 1;
+  text-align: center;
+}
+
+
+/* ---------------- DIVIDER ---------------- */
+
+.ticket-divider {
+  height: 3px;
+  background: #000;
+  margin: 0.8rem 0;
+  opacity: 0.15;
+}
+
+
+
+/* ---------------- CHECKBOX ---------------- */
+
+.ticket-select {
+  display: flex;
+  align-items: center;
+}
+
+.ticket-select input[type="checkbox"] {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid black;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticket-select input[type="checkbox"]:checked {
+  background: black;
+}
+
+.ticket-select input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+
+/* ---------------- BUTTONS ---------------- */
+
+.btn-black {
+  background: black;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+.btn-outline-black {
+  background: transparent;
+  border: 1px solid black;
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.invoice-modal {
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+  animation: modalPop 0.2s ease-out;
+}
+
+.invoice-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+@keyframes modalPop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+
+/* ----------------------- Storno Tickets ----------------------- */
+.ticket-card.storno {
+  padding: 0; /* Balken oben bündig */
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: visible;
+
+  .ticket-top {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 0.5rem 1rem;
+    background-color: #000;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .ticket-body {
+    padding: 1rem 1.5rem;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .text-muted {
+      font-size: 0.85rem;
+      color: #666;
+    }
+  }
+}
+.no-tickets-banner {
+  margin: 4rem auto;
+  max-width: 600px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  background: black;
+  color: white;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.no-tickets-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.no-tickets-sub {
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

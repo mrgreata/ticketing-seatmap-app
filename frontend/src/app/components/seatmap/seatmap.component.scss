@@ -1,0 +1,304 @@
+.seatmap-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.seatmap-actions {
+  display: flex;
+  gap: 12px; /* oder 16px, je nach Geschmack */
+  align-items: center;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.seats {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 40px;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.seat {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  border: 1px solid #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  pointer-events: auto;
+}
+
+.seat:disabled {
+  cursor: not-allowed;
+}
+
+.checkmark {
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1;
+}
+
+.seat.cat-expensive {
+  background-color: #ffffff;
+  border: 1px solid #6b7280;
+  box-shadow: none;
+}
+
+.seat.cat-middle {
+  background-color: #D7D7D7;
+}
+
+.seat.cat-cheap {
+  background-color: #E2E3FF;
+}
+
+.seat.cat-free {
+  background-color: #FFCACA;
+}
+
+.seat.status-free {
+
+}
+.seat.status-selected {
+  background-color: #64AB81;
+
+}
+
+.seat.status-sold {
+  background-color: black;
+  cursor: not-allowed;
+}
+
+.seat.status-reserved {
+  background-color: black;
+  cursor: not-allowed;
+}
+
+.seat.cat-expensive.status-sold {
+  background-color: black;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.35);
+}
+
+.seat.status-free:hover,
+.seat.status-selected:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.seat.status-selected::after {
+  content: "✔";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 3;
+}
+
+.legend {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.legend-box {
+  width: 30px;
+  height: 30px;
+  border-radius: 3px;
+  border: 1px solid #6b7280;
+}
+
+.legend-box.cat-free {
+  background-color: #FFCACA;
+}
+.legend-box.cat-cheap {
+  background-color: #E2E3FF;
+}
+.legend-box.cat-middle {
+  background-color: #D7D7D7;
+}
+.legend-box.cat-expensive {
+  background-color: #FFFFFF;
+}
+
+.legend-box.status-sold {
+  background-color: black;
+}
+
+.selection-info {
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.seat.empty {
+  visibility: hidden;
+}
+
+.stage {
+  margin: 0;
+  background: #ffffff;
+  border: 1px solid #000;
+  border-radius: 10px;
+
+  color: #000;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+
+  padding: 0.25rem 0;
+  line-height: 1;
+}
+
+.stage--in-grid {
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.seatmap-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 3rem;
+  padding-right: 1rem;
+}
+
+
+.btn-next {
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+
+  background-color: #111827;
+  color: white;
+}
+
+.btn-next:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.seat.cat-standard {
+  background-color: #D7D7D7;
+}
+
+.seat.cat-premium {
+  border-color: black;
+  background-color: #FFFFFF;
+}
+
+
+.seat-grid-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+
+  /* WICHTIG: kein flex-centering */
+  display: block;
+
+  /* bisschen Luft, damit nichts am Rand “klebt” */
+  padding: 0.5rem 16px;
+  box-sizing: border-box;
+
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Grid selbst */
+.seat-grid {
+  width: max-content;
+  margin: 0 auto;      /* zentriert nur, wenn es kleiner ist als der Container */
+  position: relative;
+
+  --cols: 23;
+  --cell: 40px;
+  --gap: 4px;
+
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-auto-rows: var(--cell);
+  gap: var(--gap);
+}
+
+
+.stage--overlay {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+}
+
+
+.stage-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.stage-main {
+  position: relative;
+  z-index: 2;
+}
+
+.stage-runway {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  margin-bottom: 0.25rem;
+  z-index: 1;
+}
+
+.seatmap-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.seatmap-actions {
+  display: flex;
+  gap: 12px; /* oder 16px */
+  align-items: center;
+}

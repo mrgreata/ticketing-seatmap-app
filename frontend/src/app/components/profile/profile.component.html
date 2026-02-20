@@ -1,0 +1,142 @@
+<div class="profile-container">
+
+  <div class="profile-title">Profil</div>
+
+    @if (loading) {
+      <div class="loading-spinner">Lade...</div>
+    }
+
+    @if (error) {
+      <div class="alert alert-danger login-alert">
+        {{ error }}
+      </div>
+    }
+
+    @if (!loading && !error && me) {
+      <div class="profile-content">
+        <!-- USER DATA CARD -->
+        <div class="profile-box">
+          <div class="section-title">Benutzerdaten</div>
+
+          <div class="form-group">
+            <label class="profile-label">E-Mail</label>
+            <div class="profile-value">
+              <div class="address-display">
+                {{ me?.email ?? '—' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="profile-label">Vorname</label>
+
+            <div class="profile-value">
+               <div class="address-display">
+                  {{ me.firstName || '—' }}
+               </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="profile-label">Nachname</label>
+            <div class="profile-value">
+              <div class="address-display">
+                {{ me.lastName || '—' }}
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="profile-label">Adresse</label>
+            <div class="profile-value">
+              @if (me?.address) {
+                <div class="address-display">
+                  {{ formatAddress(me.address) }}
+                </div>
+
+              } @else {
+                <div class="text-muted">—</div>
+              }
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              class="btn edit-button"
+              routerLink="/profile/edit">
+              <i class="bi bi-pencil me-1"></i> Bearbeiten
+            </button>
+
+            <button *ngIf="!isAdmin"
+              class="btn delete-button"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteProfileModal">
+              <i  class="bi bi-trash me-1"></i> Account Löschen
+            </button>
+          </div>
+
+          <div class="password-action">
+            <button
+                class="btn password-button"
+                routerLink="/password-reset/request">
+                <i class="bi bi-key me-1"></i> Passwort ändern
+            </button>
+          </div>
+        </div>
+
+        <!-- REWARD POINTS CARD -->
+        <div *ngIf="!isAdmin" class="profile-box">
+          <div class="section-title">Prämienpunkte</div>
+
+          <div class="points-container">
+            <div class="points-info">
+              <div class="points-label">Aktueller Punktestand</div>
+              <div class="points-value">
+                {{ points?.rewardPoints ?? '—' }}
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-dark profile-button"
+            routerLink="/merchandise/rewards">
+            ZU DEN PRÄMIEN
+          </button>
+
+          <div class="profile-hint">
+            Punkte werden bei Käufen gutgeschrieben und können später gegen Prämien eingetauscht werden.
+            Um Ihre Punkte einlösen zu können müssen Sie zuerst 50€ ausgeben.
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="modal fade" id="deleteProfileModal" tabindex="-1" aria-labelledby="deleteProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteProfileModalLabel">Konto löschen</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Möchten Sie Ihr Konto wirklich löschen?</p>
+          <p><strong>Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten gehen verloren.</strong></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            data-bs-dismiss="modal"
+            (click)="deleteAccount()"
+            [disabled]="deleteLoading">
+            @if (deleteLoading) {
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            }
+            Ja, Konto löschen
+          </button>
+        </div>
+      </div>
+    </div>
+</div>

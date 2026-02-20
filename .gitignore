@@ -1,0 +1,25 @@
+# Default ignored files
+/shelf/
+/.idea/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# IntelliJ IDEA
+.idea/
+*.iml
+.vscode/
+
+# Node / Angular
+node_modules/
+dist/
+npm-debug.log
+
+# Java / Maven
+target/
+*.class
+*.log
+.DS_Store
+e2e/cypress/results/

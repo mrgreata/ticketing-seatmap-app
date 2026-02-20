@@ -1,0 +1,104 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-2">Lade News...</p>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error && !isLoading" class="error-container alert alert-danger">
+  <div class="d-flex justify-content-between align-items-center">
+    <p class="mb-0">{{ error }}</p>
+    <div>
+      <button (click)="loadNewsDetail()" class="btn btn-sm btn-outline-danger me-2">
+        Erneut versuchen
+      </button>
+      <button (click)="goBack()" class="btn btn-sm btn-outline-secondary">
+        Zurück zur Übersicht
+      </button>
+    </div>
+  </div>
+</div>
+
+<main *ngIf="newsItem && !isLoading" class="event-detail-page">
+  <h1 class="page-title">News Details</h1>
+
+  <div class="detail-card">
+    <h2 class="event-title">{{ newsItem.title }}</h2>
+
+    <div class="event-tags">
+      <span class="tag">
+        <i class="bi bi-calendar"></i>
+        {{ formatDate(newsItem.publishedAt) }}
+      </span>
+
+      <!-- Status-Badge -->
+      <span *ngIf="isAuthenticated && isUser" class="tag bg-success text-white">
+        <i class="bi bi-check-circle"></i> Gelesen markiert
+      </span>
+      <span *ngIf="!isAuthenticated" class="tag bg-warning">
+        <i class="bi bi-exclamation-circle"></i> Nicht angemeldet
+      </span>
+    </div>
+
+    <div class="content-grid">
+      <div class="left-column">
+        <!-- Zusammenfassung -->
+        <div class="description-section mb-4">
+          <h3 class="section-title">Zusammenfassung</h3>
+          <p class="description-text">{{ newsItem.summary }}</p>
+        </div>
+
+        <!-- Vollständiger Text -->
+        <div class="description-section mb-4">
+          <h3 class="section-title">Vollständiger Artikel</h3>
+          <div class="news-text" [innerHTML]="formatText(newsItem.text)"></div>
+        </div>
+
+        <!-- Admin Buttons -->
+        <div *ngIf="isAdmin" class="admin-buttons-bottom">
+          <button class="btn btn-admin btn-edit" (click)="editNews()">
+            <i class="bi bi-pencil-fill"></i>
+            BEARBEITEN
+          </button>
+
+          <button
+            class="btn btn-admin btn-delete"
+            data-bs-toggle="modal"
+            data-bs-target="#delete-news-detail">
+            <i class="bi bi-trash-fill"></i>
+            LÖSCHEN
+          </button>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <!-- News Image -->
+        <div class="event-card-image-wrapper">
+          <img
+            class="news-card-image"
+            [src]="getNewsImageUrl(newsItem.id)"
+            (error)="onImageError($event)"
+            [alt]="newsItem.title"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-back mt-4" (click)="goBack()">
+    <i class="bi bi-arrow-left"></i> Zurück zur Übersicht
+  </button>
+</main>
+
+<app-confirm-dialog
+  *ngIf="newsItem"
+  id="delete-news-detail"
+  title="News löschen"
+  [message]="'Möchten Sie die News ' + newsItem.title + ' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+  confirmText="Ja, löschen"
+  cancelText="Abbrechen"
+  confirmButtonClass="btn-danger"
+  (confirm)="confirmDelete()">
+</app-confirm-dialog>

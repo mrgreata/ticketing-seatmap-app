@@ -1,0 +1,131 @@
+<div class="merch-detail-page">
+  <div class="container mt-4">
+
+    <div class="detail-header">
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-sm"
+        (click)="backToList()">
+        Zurück zu allen Merchandise-Artikeln
+      </button>
+    </div>
+
+    @if (loading) {
+      <div>Lade...</div>
+    }
+
+    @if (error) {
+      <div class="alert alert-danger">{{ error }}</div>
+    }
+
+    @if (!loading && item) {
+      <div class="detail-grid">
+
+        <div class="merch-detail-image-card">
+          <div class="merch-detail-image-wrapper">
+            @if (item.hasImage) {
+              <img
+                [src]="getImageUrl()!"
+                alt="{{ item.name }}"
+                class="merch-detail-image"
+                (error)="onImageError()"
+              />
+            } @else {
+              <div class="merch-detail-image-placeholder">
+                Kein Bild
+              </div>
+            }
+          </div>
+        </div>
+
+        <div>
+          <h2 class="merch-detail-title">{{ item.name }}</h2>
+
+          <p class="merch-detail-description">
+            {{ item.description }}
+          </p>
+
+          <div class="detail-meta">
+            <span class="merch-detail-price">
+              {{ item.unitPrice | number:'1.2-2' }} €
+            </span>
+
+            <span
+              class="badge"
+              [ngClass]="item.remainingQuantity > 0 ? 'bg-success' : 'bg-danger'">
+              {{ item.remainingQuantity > 0
+              ? (item.remainingQuantity + ' Stück verfügbar')
+              : 'Ausverkauft' }}
+            </span>
+          </div>
+
+          <div class="mb-3" *ngIf="item.redeemableWithPoints">
+            <span class="badge bg-dark">
+              Auch als Prämie: {{ item.pointsPrice }} Punkte
+            </span>
+          </div>
+
+          <div class="detail-actions mb-3">
+
+            <div class="quantity-group">
+              <label class="form-label">Menge</label>
+              <select
+                class="form-select"
+                [ngModel]="quantity"
+                (ngModelChange)="onQuantityChange($event)"
+                [disabled]="isAdmin || (item.remainingQuantity ?? 0) <= 0">
+                <option *ngFor="let q of getQtyOptions(item.remainingQuantity)" [ngValue]="q">
+                  {{ q }}
+                </option>
+              </select>
+
+            </div>
+
+            <button
+              class="btn btn-event-primary"
+              [disabled]="isAdmin || item.remainingQuantity <= 0 || quantityInvalid"
+              [class.admin-disabled]="isAdmin"
+              [attr.title]="isAdmin ? 'Admins können keine Artikel kaufen.' : null"
+              (click)="buy()">
+              Artikel zum Warenkorb hinzufügen
+            </button>
+
+            @if (item.redeemableWithPoints) {
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                [disabled]="isAdmin || redeeming || item.remainingQuantity <= 0 || !isRegularCustomer"
+                [class.admin-disabled]="isAdmin"
+                [attr.title]="isAdmin ? 'Admins können keine Prämien einlösen.' : null"
+                (click)="redeemWithPoints()">
+                Prämie zum Warenkorb hinzufügen ({{ item.pointsPrice }} Punkte)
+              </button>
+
+              <small class="text-muted d-block mt-1">
+                Punkte werden beim Hinzufügen zum Warenkorb reserviert/abgezogen.
+              </small>
+            }
+          </div>
+
+          @if (isAdmin) {
+            <small class="text-muted">
+              Admins können keine Merchandise-Artikel kaufen oder Prämien einlösen.
+            </small>
+          }
+
+          @if (success) {
+            <div class="alert alert-success mt-3">{{ success }}</div>
+          }
+
+          @if (error && !loading) {
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (!loading && !item && !error) {
+      <p>Artikel nicht gefunden.</p>
+    }
+  </div>
+</div>

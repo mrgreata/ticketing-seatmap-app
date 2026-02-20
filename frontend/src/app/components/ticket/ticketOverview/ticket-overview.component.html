@@ -1,0 +1,283 @@
+<main class="ticket-main container mt-4">
+  <h1 class="text-center mb-4 display-4">Meine Tickets</h1>
+
+  <!-- Info: keine Tickets -->
+  <div *ngIf="reservedTickets.length === 0 && purchasedTickets.length === 0 "
+       class="no-tickets-banner">
+
+    <div class="no-tickets-title">Noch keine Tickets vorhanden</div>
+    <div class="no-tickets-sub">
+      Sobald du Tickets reservierst oder kaufst, erscheinen sie hier.
+    </div>
+
+  </div>
+
+
+  <!-- Reservierte Tickets -->
+  <div *ngIf="reservedTickets.length > 0" class="mb-5">
+    <h2>Reservierte Tickets</h2>
+    <div class="reserved-info">
+      Bitte beachten: Reservierte Tickets müssen eine halbe Stunde vor Veranstaltungsbeginn abgeholt werden.
+    </div>
+
+    <div class="tickets-list d-flex flex-column gap-4">
+      <ng-container *ngFor="let group of reservedGroups">
+        <div class="ticket-group">
+
+          <div class="ticket-group-card">
+
+            <div class="ticket-top bg-dark text-white p-2 d-flex justify-content-between align-items-center">
+              <span>
+                {{ group.eventName }} / {{ group.tickets.length }} Ticket(s)
+              </span>
+
+              <!-- GROUP CHECKBOX -->
+              <label class="ticket-select group-select">
+                <input type="checkbox"
+                       [checked]="isGroupSelected(group)"
+                       (change)="toggleGroup(group, $event)" />
+              </label>
+
+            </div>
+
+            <!-- Alle Tickets dieses Events -->
+            <div class="ticket-body p-3">
+
+              <div *ngFor="let ticket of group.tickets; let last = last"
+                   class="ticket-row d-flex align-items-center">
+
+                <!-- Ticket Infos -->
+                <div class="ticket-info flex-grow-1 me-3">
+
+                  <div class="ticket-fields d-flex justify-content-between border-bottom pb-1 mb-1">
+                    <div class="field">Reihe</div>
+                    <div class="field">Platz</div>
+                    <div class="field">Datum</div>
+                    <div class="field">Einlass</div>
+                    <div class="field" *ngIf="ticket.reservationExpires">Reservierung verfällt</div>
+                    <div class="field">Preis</div>
+                    <div class="field" *ngIf="ticket.reservationNumber">Reservierungsnummer</div>
+                  </div>
+
+                  <div class="ticket-data d-flex justify-content-between">
+                    <div class="field">{{ ticket.rowNumber }}</div>
+                    <div class="field">{{ ticket.seatNumber }}</div>
+                    <div class="field">{{ ticket.eventDate | date:'dd/MM/yyyy' }}</div>
+                    <div class="field">{{ ticket.entryTime }}</div>
+                    <div class="field" *ngIf="ticket.reservationExpires">
+                      {{ ticket.reservationExpires | date:'short' }}
+                    </div>
+                    <div class="field">{{ ticket.price }}€</div>
+                    <div class="field" *ngIf="ticket.reservationNumber">
+                      {{ ticket.reservationNumber }}
+                    </div>
+                  </div>
+                  <!-- Trennlinie zwischen Tickets -->
+                  <div *ngIf="!last" class="ticket-divider"></div>
+
+                </div>
+
+                <!-- Checkbox -->
+                <div class="ticket-select">
+                  <input type="checkbox" [(ngModel)]="ticket.selected" />
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="ticket-actions mt-3 d-flex gap-2">
+      <button class="btn btn-outline-black" (click)="cancelReservation()">Reservierung(en) stornieren</button>
+      <button class="btn btn-black" (click)="addReservedTicketsToCart()">Ticket(s) zum Warenkorb hinzufügen</button>
+    </div>
+  </div>
+
+  <!-- Gekaufte Tickets -->
+  <div *ngIf="purchasedTickets.length > 0">
+
+    <!-- Zukünftige Tickets -->
+    <div class="ticket-group mb-3" *ngIf="upcomingTickets.length > 0">
+      <h2 (click)="toggleUpcomingTickets()" class="ticket-group-title">
+        Zukünftige Veranstaltungen
+        <span>{{ upcomingCollapsed ? '+' : '-' }}</span>
+      </h2>
+      <div *ngIf="!upcomingCollapsed" class="tickets-list d-flex flex-column gap-4">
+        <ng-container *ngFor="let group of upcomingGroups">
+
+          <div class="ticket-group-card">
+
+            <div class="ticket-top bg-dark text-white p-2 d-flex justify-content-between align-items-center">
+              <span>
+                {{ group.eventName }} / {{ group.tickets.length }} Ticket(s)
+              </span>
+
+              <!-- GROUP CHECKBOX -->
+              <label class="ticket-select group-select">
+                <input type="checkbox"
+                       [checked]="isGroupSelected(group)"
+                       (change)="toggleGroup(group, $event)" />
+              </label>
+
+            </div>
+
+            <!-- Alle Tickets dieses Events -->
+            <div class="ticket-body p-3">
+
+              <div *ngFor="let ticket of group.tickets; let last = last"
+                   class="ticket-row d-flex align-items-center">
+
+                <!-- Ticket Infos -->
+                <div class="ticket-info flex-grow-1 me-3">
+
+                  <div class="ticket-fields d-flex justify-content-between border-bottom pb-1 mb-1">
+                    <div class="field">Reihe</div>
+                    <div class="field">Platz</div>
+                    <div class="field">Datum</div>
+                    <div class="field">Einlass</div>
+                    <div class="field">Preis</div>
+
+                  </div>
+
+                  <div class="ticket-data d-flex justify-content-between">
+                    <div class="field">{{ ticket.rowNumber }}</div>
+                    <div class="field">{{ ticket.seatNumber }}</div>
+                    <div class="field">{{ ticket.eventDate | date:'dd/MM/yyyy' }}</div>
+                    <div class="field">{{ ticket.entryTime }}</div>
+                    <div class="field">{{ ticket.price }}€</div>
+                  </div>
+                  <!-- Trennlinie zwischen Tickets -->
+                  <div *ngIf="!last" class="ticket-divider"></div>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="ticket-select">
+                  <input type="checkbox" [(ngModel)]="ticket.selected" />
+                </div>
+              </div>
+
+
+
+            </div>
+          </div>
+
+        </ng-container>
+      </div>
+
+      <div class="ticket-actions mt-3 d-flex gap-2">
+        <button class="btn btn-outline-black" (click)="cancelPurchasedTickets()">Ticket(s) stornieren</button>
+        <button class="btn btn-black" (click)="downloadSelectedInvoices()">Rechnung(en) herunterladen</button>
+      </div>
+    </div>
+
+    <!-- Vergangene Tickets -->
+    <div class="ticket-group mb-3" *ngIf="pastTickets.length > 0">
+      <h2 (click)="togglePastTickets()" class="ticket-group-title">
+        Vergangene Veranstaltungen
+        <span>{{ pastCollapsed ? '+' : '-' }}</span>
+      </h2>
+      <div *ngIf="!pastCollapsed" class="tickets-list d-flex flex-column gap-4">
+        <ng-container *ngFor="let group of pastGroups">
+          <div class="ticket-group-card">
+
+            <div class="ticket-top bg-dark text-white p-2 d-flex justify-content-between align-items-center">
+              <span>
+                {{ group.eventName }} ({{ group.tickets.length }} Ticket(s))
+              </span>
+
+              <!-- GROUP CHECKBOX -->
+              <label class="ticket-select group-select">
+                <input type="checkbox"
+                       [checked]="isGroupSelected(group)"
+                       (change)="toggleGroup(group, $event)" />
+              </label>
+
+            </div>
+
+            <!-- Alle Tickets dieses Events -->
+            <div class="ticket-body p-3">
+
+              <div *ngFor="let ticket of group.tickets; let last = last"
+                   class="ticket-row d-flex align-items-center">
+
+                <!-- Ticket Infos -->
+                <div class="ticket-info flex-grow-1 me-3">
+
+                  <div class="ticket-fields d-flex justify-content-between border-bottom pb-1 mb-1">
+                    <div class="field">Reihe</div>
+                    <div class="field">Platz</div>
+                    <div class="field">Datum</div>
+                    <div class="field">Einlass</div>
+                    <div class="field">Preis</div>
+
+                  </div>
+
+                  <div class="ticket-data d-flex justify-content-between">
+                    <div class="field">{{ ticket.rowNumber }}</div>
+                    <div class="field">{{ ticket.seatNumber }}</div>
+                    <div class="field">{{ ticket.eventDate | date:'dd/MM/yyyy' }}</div>
+                    <div class="field">{{ ticket.entryTime }}</div>
+                    <div class="field">{{ ticket.price }}€</div>
+                  </div>
+                  <!-- Trennlinie zwischen Tickets -->
+                  <div *ngIf="!last" class="ticket-divider"></div>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="ticket-select">
+                  <input type="checkbox" [(ngModel)]="ticket.selected" />
+                </div>
+              </div>
+
+
+
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal für Rechnung -->
+<div class="modal-backdrop-custom" *ngIf="showInvoiceModal">
+  <div class="invoice-modal">
+    <h2>Rechnung herunterladen</h2>
+    <p>Möchtest du die Rechnung als PDF herunterladen?</p>
+
+    <label class="invoice-checkbox">
+      <input type="checkbox" [(ngModel)]="wantInvoice">
+      <span>Rechnung nach dem Kauf öffnen</span>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-outline-black" (click)="cancelInvoiceModal()">Abbrechen</button>
+      <button class="btn-black" (click)="confirmPurchase()">Kaufen</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop-custom" *ngIf="showCreditModal">
+  <div class="invoice-modal">
+    <h2>Tickets stornieren</h2>
+    <p>Möchtest du die ausgewählten Tickets stornieren?</p>
+
+    <label class="invoice-checkbox">
+      <input type="checkbox" [(ngModel)]="wantCreditInvoice">
+      <span>Stornorechnung als PDF herunterladen</span>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-outline-black" (click)="cancelCreditModal()">Abbrechen</button>
+      <button class="btn-black" (click)="confirmCreditInvoice()">Stornieren</button>
+    </div>
+  </div>
+</div>
+
+

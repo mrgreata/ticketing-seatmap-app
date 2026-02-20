@@ -1,0 +1,708 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800&display=swap');
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Hero Section */
+.hero {
+  min-height: 400px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 2rem;
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 1200px;
+
+  h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .lead {
+    font-size: 1.5rem;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+  }
+
+  .btn {
+    min-width: 180px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+
+    &-dark {
+      background: #333;
+      border-color: #333;
+
+      &:hover {
+        background: #444;
+        border-color: #444;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    &-outline-dark {
+      color: white;
+      border-color: white;
+
+      &:hover {
+        background: white;
+        color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 3rem 1rem;
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    .lead {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+
+/* Main Container */
+main {
+  padding: 1rem 1.5rem 2rem;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
+/* Section Headers */
+section {
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  .btn-outline-primary {
+    padding: 8px 20px;
+    border: 2px solid #C0D3DF;
+    color: #000;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #C0D3DF;
+      border-color: #C0D3DF;
+    }
+  }
+}
+
+/* Top Ten Card */
+.top-ten-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-top: 2rem;
+
+  .top-ten-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: #e9ecef;
+    }
+
+    .toggle-icon {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #6c757d;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: white;
+    }
+  }
+
+  .top-ten-body {
+    padding: 2rem;
+  }
+
+  .top-ten-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+
+    .form-select,
+    .form-control {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 15px;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      background: white;
+
+      &:focus {
+        border-color: #C0D3DF;
+        box-shadow: 0 0 0 0.2rem rgba(192, 211, 223, 0.25);
+      }
+    }
+  }
+
+  .top-ten-list {
+    .top-ten-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #f8f9fa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .event-info {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+
+        .event-rank {
+          font-size: 1.2rem;
+          font-weight: 800;
+          color: #C0D3DF;
+          min-width: 30px;
+        }
+
+        .event-title {
+          font-weight: 600;
+          color: #333;
+          flex: 1;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .event-tickets {
+          color: #6c757d;
+          font-size: 0.9rem;
+          white-space: nowrap;
+        }
+      }
+
+      .bar-container {
+        flex: 2;
+        height: 20px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+
+        .bar {
+          height: 100%;
+          background: linear-gradient(90deg, #C0D3DF, #a8c1d1);
+          border-radius: 10px;
+          transition: width 0.5s ease;
+        }
+      }
+
+      .btn-saalplan {
+        padding: 8px 20px;
+        background: #3b5640;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #218838;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+      }
+    }
+  }
+}
+
+/* News Card Styling - identisch mit news-home.component.scss */
+.news-card {
+  width: 100%;
+  min-height: 100%;
+  background: white;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.news-card-header {
+  padding: 8px 8px 0 8px;
+}
+
+.news-card-header-content {
+  height: 75px;
+  padding: 0 16px;
+  display: flex;
+  gap: 32px;
+}
+
+.news-card-date {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 60px;
+}
+
+.news-card-month {
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+}
+
+.news-card-day {
+  color: black;
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+}
+
+.news-card-title-wrapper {
+  flex: 1;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.news-card-title {
+  color: black;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+
+  max-height: 3em;
+}
+
+.news-card-divider-wrapper {
+  padding: 0 16px;
+}
+
+.news-card-divider {
+  height: 1px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) inset;
+  border-top: 1px solid black;
+  margin: 8px 0;
+}
+
+.news-card-image-wrapper {
+  position: relative;
+  width: 90%;
+  height: 150px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.news-card-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.news-card-summary {
+  padding: 16px 16px 8px 16px;
+  width: 100%;
+}
+
+.news-card-summary-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #707070;
+  font-size: 13px;
+  font-family: Roboto;
+  font-weight: 700;
+  line-height: 15px;
+  letter-spacing: 0.25px;
+  word-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 3.5rem;
+}
+
+.news-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px;
+}
+
+.news-card-button {
+  padding: 8px 16px;
+  background: #F5F5F5;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.87);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  height: 36px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &:hover {
+    background-color: #333;
+    color: white;
+    border-color: #333;
+  }
+}
+
+.news-card-button-text {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+  white-space: nowrap;
+}
+
+/* Event Card Styling - identisch mit event-list.component.scss */
+.event-card {
+  width: 100%;
+  min-height: 450px;
+  background: white;
+  box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.event-card-header {
+  padding: 8px 8px 0 8px;
+}
+
+.event-card-header-content {
+  height: 75px;
+  padding: 0 16px;
+  display: flex;
+  gap: 32px;
+}
+
+.event-card-date {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 60px;
+}
+
+.event-card-month {
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+}
+
+.event-card-day {
+  color: black;
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+}
+
+.event-card-title-wrapper {
+  flex: 1;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.event-card-title {
+  color: black;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+
+  max-height: 3em;
+}
+
+.event-card-divider-wrapper {
+  padding: 0 16px;
+}
+
+.event-card-divider {
+  height: 1px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25) inset;
+  border-top: 1px solid black;
+  margin: 8px 0;
+}
+
+.event-card-image-wrapper {
+  position: relative;
+  width: 90%;
+  height: 150px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.event-card-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.event-card-details {
+  padding: 16px 16px 12px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 120px;
+}
+
+.event-card-details-text {
+  color: #707070;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+}
+
+.event-description {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.5;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  font-weight: 400;
+  font-style: italic;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  max-height: 4.5em;
+}
+
+.event-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px;
+}
+
+.event-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.event-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-right: 16px;
+  border-right: 2px solid #d0d0d0;
+
+  .price-label {
+    font-size: 10px;
+    color: #999;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
+  .price-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+}
+
+.event-card-button {
+  padding: 8px 16px;
+  background: #F5F5F5;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.87);
+  text-decoration: none;
+  cursor: pointer;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #333;
+    border-color: #333;
+
+    .event-card-button-text {
+      color: white;
+    }
+  }
+}
+
+.event-card-button-text {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.25px;
+}
+
+/* Grid System */
+.row {
+  margin: 0 -0.5rem;
+
+  .col-md-3 {
+    padding: 0 0.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Alert Styles */
+.alert {
+  border-radius: 8px;
+  margin: 1rem 0;
+  padding: 1rem;
+
+  &-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+  }
+
+  &-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  main {
+    padding: 0.5rem;
+  }
+
+  .container {
+    padding: 0 0.5rem;
+  }
+
+  .row {
+    margin: 0 -0.25rem;
+
+    .col-md-3 {
+      padding: 0 0.25rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  section {
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    .btn-outline-primary {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+  }
+
+  .news-card-title,
+  .event-card-title {
+    font-size: 0.9rem;
+  }
+
+  .news-card-summary-text,
+  .event-card-details-text {
+    font-size: 0.8rem;
+  }
+
+  .news-card-button,
+  .event-card-button {
+    font-size: 0.7rem;
+    padding: 6px 12px;
+  }
+}

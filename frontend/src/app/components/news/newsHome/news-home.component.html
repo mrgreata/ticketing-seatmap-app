@@ -1,0 +1,236 @@
+<main *ngIf="!isLoading && !error" class="container mt-4">
+  <!-- Page Title -->
+  <div class="text-center mb-4">
+    <h1 class="fw-bold">News</h1>
+    <p class="text-muted" *ngIf="!isAuthenticated">
+      Alle verfügbaren News
+    </p>
+    <p class="text-muted" *ngIf="isAuthenticated && isUser">
+      Ihre persönliche News-Übersicht
+    </p>
+    <p class="text-muted" *ngIf="isAuthenticated && isAdmin">
+      Admin-Ansicht: Alle News
+    </p>
+
+    <div class="placeholder-right" *ngIf="isAuthenticated && isAdmin">
+      <button
+        *ngIf="isAdmin"
+        class="btn-admin-create"
+        (click)="navigateToCreateNews()">
+        <i class="bi bi-plus-circle"></i>
+        Neue News erstellen
+      </button>
+    </div>
+  </div>
+
+  <!-- all news -->
+  <section *ngIf="currentNews.length > 0">
+    <h4>
+      <span *ngIf="isAuthenticated && isUser">Aktuelle News</span>
+      <span *ngIf="isAuthenticated && isAdmin">Veröffentlichte News</span>
+    </h4>
+    <hr />
+
+    <div class="row g-3">
+      <div class="col-md-3" *ngFor="let news of currentNews">
+        <div class="news-card">
+          <!-- Date and Title Row -->
+          <div class="news-card-header">
+            <div class="news-card-header-content">
+              <!-- Date Section -->
+              <div class="news-card-date">
+                <div class="news-card-month">
+                  {{ getMonthFromDate(news.publishedAt) }}
+                </div>
+                <div class="news-card-day">
+                  {{ getDayFromDate(news.publishedAt) }}
+                </div>
+              </div>
+
+              <!-- Title Section -->
+              <div class="news-card-title-wrapper">
+                <div class="news-card-title">
+                  {{ news.title }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Line -->
+          <div class="news-card-divider-wrapper">
+            <div class="news-card-divider"></div>
+          </div>
+
+          <!-- Image -->
+          <div class="news-card-image-wrapper">
+            <img
+              class="news-card-image"
+              [src]="getNewsImageUrl(news.id)"
+              (error)="onImageError($event)"
+              [alt]="news.title"
+            />
+          </div>
+
+          <!-- Summary -->
+          <div class="news-card-summary">
+            <div class="news-card-summary-text">
+              {{ news.summary && news.summary.length > 80 ? (news.summary.substring(0, 80) + '...') : news.summary }}
+            </div>
+          </div>
+
+          <!-- Details Button -->
+          <div class="news-card-footer">
+            <div class="news-card-admin-actions-footer">
+              <ng-container *ngIf="isAdmin">
+                <i class="bi bi-pencil admin-icon admin-icon-edit"
+                   (click)="editNews(news.id, $event)"
+                   title="Bearbeiten"></i>
+                <i class="bi bi-trash admin-icon admin-icon-delete"
+                   data-bs-toggle="modal"
+                   [attr.data-bs-target]="'#delete-news-' + news.id"
+                   (click)="$event.stopPropagation(); $event.preventDefault()"
+                   title="Löschen"></i>
+              </ng-container>
+            </div>
+
+
+            <a [routerLink]="['/news/detail', news.id]" class="news-card-button">
+              <span class="news-card-button-text">Details</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More Button for Current News -->
+    <div *ngIf="hasMoreCurrentNews" class="text-center my-4">
+      <button
+        class="btn-load-more"
+        (click)="loadMoreCurrentNews()"
+        [disabled]="isLoadingMoreCurrentNews">
+        <span *ngIf="!isLoadingMoreCurrentNews">Weitere News laden</span>
+        <span *ngIf="isLoadingMoreCurrentNews">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Laden...
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <div *ngIf="isAuthenticated && isUser && currentNews.length === 0 && alreadySeen.length > 0"
+       class="alert alert-info mt-4">
+    <p class="mb-0">
+      <i class="bi bi-check-circle"></i>
+      Sie haben alle aktuellen News bereits gelesen.
+    </p>
+  </div>
+
+  <section *ngIf="isAuthenticated && alreadySeen.length > 0" class="mt-5">
+    <h4>
+      <span *ngIf="!isAdmin">Bereits gelesene News</span>
+      <span *ngIf="isAdmin">Noch nicht veröffentlichte News</span>
+    </h4>
+    <hr />
+    <div class="row g-3">
+      <div class="col-md-3" *ngFor="let news of alreadySeen">
+        <div class="news-card news-card-read">
+          <!-- Date and Title Row -->
+          <div class="news-card-header">
+            <div class="news-card-header-content">
+              <!-- Date Section -->
+              <div class="news-card-date">
+                <div class="news-card-month">
+                  {{ getMonthFromDate(news.publishedAt) }}
+                </div>
+                <div class="news-card-day">
+                  {{ getDayFromDate(news.publishedAt) }}
+                </div>
+              </div>
+
+              <!-- Title Section -->
+              <div class="news-card-title-wrapper">
+                <div class="news-card-title">
+                  {{ news.title }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Line -->
+          <div class="news-card-divider-wrapper">
+            <div class="news-card-divider"></div>
+          </div>
+
+          <!-- Image -->
+          <div class="event-card-image-wrapper">
+            <img
+              class="news-card-image"
+              [src]="getNewsImageUrl(news.id)"
+              (error)="onImageError($event)"
+              [alt]="news.title"
+            />
+          </div>
+
+          <!-- Summary -->
+          <div class="news-card-summary">
+            <div class="news-card-summary-text">
+              {{ news.summary && news.summary.length > 80 ? (news.summary.substring(0, 80) + '...') : news.summary }}
+            </div>
+          </div>
+
+          <!-- Details Button -->
+          <div class="news-card-footer">
+            <div class="news-card-admin-actions-footer">
+              <ng-container *ngIf="isAdmin">
+                <i class="bi bi-pencil admin-icon admin-icon-edit"
+                   (click)="editNews(news.id, $event)"
+                   title="Bearbeiten"></i>
+                <i class="bi bi-trash admin-icon admin-icon-delete"
+                   data-bs-toggle="modal"
+                   [attr.data-bs-target]="'#delete-news-' + news.id"
+                   (click)="$event.stopPropagation(); $event.preventDefault()"
+                   title="Löschen"></i>
+              </ng-container>
+            </div>
+
+
+            <a [routerLink]="['/news/detail', news.id]" class="news-card-button">
+              <span class="news-card-button-text">Details</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load More Button for Already Seen News -->
+    <div *ngIf="hasMoreAlreadySeen" class="text-center my-4">
+      <button
+        class="btn-load-more"
+        (click)="loadMoreAlreadySeen()"
+        [disabled]="isLoadingMoreAlreadySeen">
+        <span *ngIf="!isLoadingMoreAlreadySeen">Weitere News laden</span>
+        <span *ngIf="isLoadingMoreAlreadySeen">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Laden...
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Keine News vorhanden -->
+  <div *ngIf="currentNews.length === 0 && alreadySeen.length === 0" class="alert alert-warning">
+    <p class="mb-0">Es sind derzeit keine News verfügbar.</p>
+  </div>
+</main>
+
+<ng-container *ngFor="let new of currentNews">
+  <app-confirm-dialog
+    [id]="'delete-news-' + new.id"
+    title="News löschen"
+    [message]="'Möchten Sie die News ' + (new.title.length > 30 ? (new.title.substring(0, 25) + '...') : new.title) + ' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+    confirmText="Ja, löschen"
+    cancelText="Abbrechen"
+    confirmButtonClass="btn-danger"
+    (confirm)="deleteNews(new.id)">
+  </app-confirm-dialog>
+</ng-container>

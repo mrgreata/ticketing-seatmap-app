@@ -1,0 +1,215 @@
+<div class="container mt-4">
+  <h2>Zahlung & Bestellung</h2>
+
+  @if (loading) {
+    <div class="alert alert-info mt-3">Lade Warenkorb...</div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger mt-3">{{ error }}</div>
+  }
+
+  @if (!loading && !error) {
+
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Bestellübersicht</h5>
+
+        @if (merchandiseLines.length > 0) {
+          <h6 class="mt-3">Merchandise</h6>
+          <ul class="mb-0">
+            @for (m of merchandiseLines; track m.merchandiseId) {
+              <li class="checkout-line">
+                <span class="checkout-line-name">{{ m.name }}</span>
+                <div class="checkout-line-meta">
+                  Menge: {{ m.quantity }} — Gesamt: {{ m.totalPrice | number:'1.2-2' }} €
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (ticketLines.length > 0) {
+          <h6 class="mt-3">Tickets</h6>
+          <ul class="mb-0">
+            @for (t of ticketLines; track t.ticketId) {
+              <li class="checkout-line">
+                <span class="checkout-line-name">{{ t.eventTitle }}</span>
+                <div class="checkout-line-meta">
+                  Tickets: {{ t.ticketCount }} — Gesamt: {{ t.totalPrice | number:'1.2-2' }} €
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        <hr />
+        <div class="fw-bold">
+          Gesamt: {{ cart?.total ?? 0 }} €
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body">
+        <h5 class="card-title">Zahlungsmethode</h5>
+
+        <form #paymentForm="ngForm" (ngSubmit)="submit(paymentForm)">
+
+          <select class="form-select"
+                  name="paymentMethod"
+                  [(ngModel)]="paymentMethod"
+                  (ngModelChange)="onPaymentMethodChange()">
+            <option [ngValue]="PaymentMethod.CREDIT_CARD">Kreditkarte</option>
+            <option [ngValue]="PaymentMethod.PAYPAL">PayPal</option>
+          </select>
+
+          <div class="mt-3">
+
+            @if (paymentMethod === PaymentMethod.CREDIT_CARD) {
+
+              <div class="mb-2">
+                <label class="form-label">Kartennummer (16 Ziffern)</label>
+                <input
+                  class="form-control"
+                  name="cardNumber"
+                  [(ngModel)]="paymentDetail.cardNumber"
+                  #cardNumber="ngModel"
+                  required
+                  pattern="^\d{16}$"
+                  luhnValidator
+                  inputmode="numeric"
+                  maxlength="16"
+                  autocomplete="cc-number"
+                />
+
+                @if (cardNumber.touched && cardNumber.errors) {
+                  <small class="text-danger">
+                    @if (cardNumber.errors['required']) {
+                      Kartennummer ist erforderlich.
+                    }
+                    @if (cardNumber.errors['pattern']) {
+                      Kartennummer muss genau 16 Ziffern haben.
+                    }
+                    @if (cardNumber.errors['luhn']) {
+                      Kartennummer ist ungültig. Bitte überprüfen Sie die Eingabe.
+                    }
+                  </small>
+                }
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">Ablaufdatum (MMYY)</label>
+                <input
+                  class="form-control"
+                  name="expiryMonthYear"
+                  [(ngModel)]="paymentDetail.expiryMonthYear"
+                  #expiryMonthYear="ngModel"
+                  required
+                  pattern="^(0[1-9]|1[0-2])\d{2}$"
+                  notExpiredValidator
+                  inputmode="numeric"
+                  maxlength="4"
+                  autocomplete="cc-exp"
+                />
+
+                @if (expiryMonthYear.touched && expiryMonthYear.errors) {
+                  <small class="text-danger">
+                    @if (expiryMonthYear.errors['required']) {
+                      Ablaufdatum ist erforderlich.
+                    }
+                    @if (expiryMonthYear.errors['pattern']) {
+                      Ablaufdatum muss im Format MMYY sein.
+                    }
+                    @if (expiryMonthYear.errors['expired']) {
+                      Kreditkarte ist abgelaufen. Bitte verwenden Sie eine gültige Kreditkarte.
+                    }
+                  </small>
+                }
+              </div>
+
+              <div class="mb-2">
+                <label class="form-label">CVC (3 Ziffern)</label>
+                <input
+                  class="form-control"
+                  name="cvc"
+                  [(ngModel)]="paymentDetail.cvc"
+                  #cvc="ngModel"
+                  required
+                  pattern="^\d{3}$"
+                  inputmode="numeric"
+                  maxlength="3"
+                  autocomplete="cc-csc"
+                />
+
+                @if (cvc.touched && cvc.errors) {
+                  <small class="text-danger">
+                    @if (cvc.errors['required']) {
+                      CVC ist erforderlich.
+                    }
+                    @if (cvc.errors['pattern']) {
+                      CVC muss genau 3 Ziffern haben.
+                    }
+                  </small>
+                }
+              </div>
+            }
+
+            @if (paymentMethod === PaymentMethod.PAYPAL) {
+              <button
+                type="button"
+                class="btn paypal-button"
+                (click)="submitPaypal(paymentForm)"
+                [disabled]="loading">
+
+                <img
+                  src="assets/paypal.png"
+                  alt="PayPal"
+                  class="paypal-logo" />
+              </button>
+            }
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-secondary"
+                    type="button"
+                    (click)="cancel()"
+                    [disabled]="loading">
+              Abbrechen
+            </button>
+
+            @if (paymentMethod !== PaymentMethod.PAYPAL) {
+              <button class="btn btn-event-primary btn-sm"
+                      type="submit"
+                      [disabled]="loading">
+                @if (loading) {
+                  Bestellung wird verarbeitet...
+                } @else {
+                  Zahlungspflichtig bestellen
+                }
+              </button>
+            }
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+</div>
+
+<div class="modal-backdrop-custom" *ngIf="showInvoiceModal">
+  <div class="invoice-modal">
+    <h2>Rechnung herunterladen</h2>
+    <p>Möchtest du die Rechnung(en) als PDF herunterladen?</p>
+
+    <label class="invoice-checkbox">
+      <input type="checkbox" [(ngModel)]="wantInvoice">
+      <span>Rechnung nach dem Kauf öffnen</span>
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn-outline-black" (click)="cancelInvoiceModal()">Abbrechen</button>
+      <button class="btn-black" (click)="confirmCheckout()">Bestellung abschließen</button>
+    </div>
+  </div>
+</div>

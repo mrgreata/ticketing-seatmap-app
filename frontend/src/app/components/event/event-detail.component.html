@@ -1,0 +1,85 @@
+<div *ngIf="loading" class="loading-container">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-2">Lade Veranstaltung...</p>
+</div>
+
+<main *ngIf="event && !loading" class="event-detail-page">
+  <h1 class="page-title">Details</h1>
+
+  <div class="detail-card">
+    <h2 class="event-title">{{ event.title }}</h2>
+
+    <div class="event-tags">
+      <span class="tag">{{ formatDate(event.dateTime) }}</span>
+      <span class="tag">{{ formatTime(event.dateTime) }}</span>
+      <span class="tag">{{ event.location.city }}</span>
+      <span class="tag">{{ event.location.street }} {{ event.location.streetNumber }}</span>
+      <span class="tag" *ngFor="let artist of event.artists">{{ artist.name }}</span>
+      <span class="tag" *ngIf="event.minPrice">
+        ab {{ (event.minPrice / 100) | number:'1.2-2' }}€
+      </span>
+    </div>
+
+    <div class="content-grid">
+      <div class="left-column">
+        <div class="description-section">
+          <p class="description-text" *ngIf="event.description; else noDescription">
+            {{ event.description }}
+          </p>
+          <ng-template #noDescription>
+            <p class="text-muted fst-italic">Keine Beschreibung verfügbar</p>
+          </ng-template>
+        </div>
+
+        <div *ngIf="isAdmin()" class="admin-buttons-bottom">
+          <button class="btn btn-admin btn-edit" (click)="editEvent()">
+            <i class="bi bi-pencil-fill"></i>
+            BEARBEITEN
+          </button>
+
+          <button
+            class="btn btn-admin btn-delete"
+            data-bs-toggle="modal"
+            data-bs-target="#delete-event-detail">
+            <i class="bi bi-trash-fill"></i>
+            LÖSCHEN
+          </button>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="event-image-wrapper">
+          <img
+            [src]="getEventImageUrl()"
+            [alt]="event.title"
+            class="event-image"
+            (error)="onImageError($event)"
+          />
+        </div>
+
+        <div class="saalplan-button-wrapper">
+          <button class="btn btn-saalplan" (click)="openSeatmap()">
+            SAALPLAN
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-back mt-4" (click)="goBack()">
+    <i class="bi bi-arrow-left"></i> Zurück zur Übersicht
+  </button>
+</main>
+
+<app-confirm-dialog
+  *ngIf="event"
+  id="delete-event-detail"
+  title="Veranstaltung löschen"
+  [message]="'Möchten Sie die Veranstaltung ' + getTruncatedTitle() + ' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+  confirmText="Ja, löschen"
+  cancelText="Abbrechen"
+  confirmButtonClass="btn-danger"
+  (confirm)="deleteEvent()">
+</app-confirm-dialog>

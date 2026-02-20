@@ -1,0 +1,52 @@
+<div class="login-container">
+
+  <div class="login-title">
+    Passwort zurücksetzen
+  </div>
+
+  <div class="login-box">
+
+    <p class="reset-info">
+      Gib deine E-Mail-Adresse ein. Falls ein Konto existiert,
+      senden wir dir einen Link zum Zurücksetzen deines Passworts.
+    </p>
+
+    <form [formGroup]="resetForm" (ngSubmit)="requestReset()">
+
+      <div class="form-group">
+        <input
+          type="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="E-Mail-Adresse">
+
+        @if (resetForm.controls.email.touched && resetForm.controls.email.errors) {
+          <small class="text-danger">
+            @if (resetForm.controls.email.errors.required) {
+              E-Mail-Adresse ist erforderlich.
+            }
+            @if (resetForm.controls.email.errors.email) {
+              Bitte eine gültige E-Mail-Adresse eingeben.
+            }
+          </small>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-dark login-button"
+        [disabled]="resetForm.invalid || loading">
+        LINK ANFORDERN
+      </button>
+
+    </form>
+
+    @if (success) {
+      <div class="login-register-link">
+        <a routerLink="/login">Zurück zum Login</a>
+      </div>
+    }
+
+  </div>
+
+</div>

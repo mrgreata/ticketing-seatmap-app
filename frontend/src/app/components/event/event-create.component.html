@@ -1,0 +1,293 @@
+<main class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h2 mb-1">Neue Veranstaltung erstellen</h1>
+          <p class="text-muted mb-0">Erstellen Sie eine neue Veranstaltung für die Ticketline-Plattform</p>
+        </div>
+        <button (click)="goBack()" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Zurück
+        </button>
+      </div>
+
+      <div *ngIf="isAdmin">
+        <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" [class.submitting]="isLoading">
+
+          <div class="mb-4">
+            <label for="title" class="form-label fw-bold">
+              Titel <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              id="title"
+              formControlName="title"
+              placeholder="z.B. Wiener Philharmoniker Neujahrskonzert"
+              maxlength="50"
+            />
+
+            @if (eventForm.controls.title.touched && eventForm.controls.title.errors) {
+              <small class="text-danger">
+                @if (eventForm.controls.title.errors.required) {
+                  Titel ist erforderlich.
+                }
+                @if (eventForm.controls.title.errors.maxlength) {
+                  Titel darf maximal 50 Zeichen lang sein.
+                }
+              </small>
+            }
+
+            <div class="form-text">
+              {{ eventForm.value.title?.length || 0 }}/50 Zeichen
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="type" class="form-label fw-bold">
+              Typ <span class="text-danger">*</span>
+            </label>
+            <select
+              class="form-select"
+              id="type"
+              formControlName="type"
+            >
+              <option value="" disabled selected>Bitte wählen...</option>
+              <option *ngFor="let type of eventTypes" [value]="type">{{ type }}</option>
+            </select>
+
+            @if (eventForm.controls.type.touched && eventForm.controls.type.errors) {
+              <small class="text-danger">
+                Typ ist erforderlich.
+              </small>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label for="duration" class="form-label fw-bold">
+              Dauer (in Minuten) <span class="text-danger">*</span>
+            </label>
+            <input
+              type="number"
+              class="form-control"
+              id="duration"
+              formControlName="durationMinutes"
+              min="1"
+              max="9999"
+              placeholder="z.B. 120"
+              (keypress)="onlyNumbers($event)"
+              oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);"
+            />
+
+            @if (eventForm.controls.durationMinutes.touched && eventForm.controls.durationMinutes.errors) {
+              <small class="text-danger">
+                @if (eventForm.controls.durationMinutes.errors.min) {
+                  Dauer muss mindestens 1 Minute betragen.
+                }
+                @else if (eventForm.controls.durationMinutes.errors.max) {
+                  Dauer darf maximal 9999 Minuten betragen.
+                }
+                @else{
+                  <small class="text-danger">
+                    Dauer ist erforderlich.
+                  </small>
+                }
+              </small>
+            }
+
+            <div class="form-text">
+              Maximal 9999 Minuten (ca. 7 Tage)
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="dateTime" class="form-label fw-bold">
+              Datum und Uhrzeit <span class="text-danger">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              id="dateTime"
+              formControlName="dateTime"
+              [min]="minDateTime"
+            />
+
+            @if (eventForm.controls.dateTime.touched && eventForm.controls.dateTime.errors) {
+              <small class="text-danger">
+                @if (eventForm.controls.dateTime.errors['required']) {
+                  Datum und Uhrzeit sind erforderlich.
+                }
+                @if (eventForm.controls.dateTime.errors['pastDate']) {
+                  Das Datum muss in der Zukunft liegen.
+                }
+              </small>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label for="location" class="form-label fw-bold">
+              Ort <span class="text-danger">*</span>
+            </label>
+            <select
+              class="form-select"
+              id="location"
+              formControlName="locationId"
+            >
+              <option [value]="null" disabled selected>Bitte wählen...</option>
+              <option *ngFor="let location of locations" [value]="location.id">
+                {{ location.name }} - {{ location.city }}
+              </option>
+            </select>
+
+            @if (eventForm.controls.locationId.touched && eventForm.controls.locationId.errors) {
+              <small class="text-danger">
+                Ort ist erforderlich.
+              </small>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label for="eventImage" class="form-label fw-bold">
+              Veranstaltungs-Bild (optional)
+            </label>
+
+            <input
+              id="eventImage"
+              type="file"
+              accept="image/*"
+              class="form-control"
+              (change)="onImageSelected($event)"
+            />
+
+            <div class="form-text">
+              Unterstützte Formate: JPG, PNG, WebP (max. 3 MB)
+            </div>
+
+            <div *ngIf="previewImageUrl" class="image-preview-container">
+              <p class="text-success small mb-2">
+                <i class="bi bi-check-circle"></i> Ausgewähltes Bild:
+              </p>
+              <div class="image-preview-box preview-new">
+                <img
+                  [src]="previewImageUrl"
+                  alt="Bild-Vorschau"
+                  class="preview-image"
+                />
+                <button type="button" class="btn-remove" (click)="removeImage()" title="Entfernen">
+                  <i class="bi bi-x-circle"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="artistSearch" class="form-label fw-bold">
+              Künstler (optional)
+            </label>
+
+            <div class="artist-autocomplete-wrapper">
+              <input
+                type="text"
+                class="form-control"
+                id="artistSearch"
+                [(ngModel)]="artistSearchTerm"
+                [ngModelOptions]="{standalone: true}"
+                (input)="onArtistSearchChange()"
+                (blur)="onArtistInputBlur()"
+                placeholder="Künstler suchen und hinzufügen..."
+                autocomplete="off"
+              />
+
+              <div
+                *ngIf="showArtistDropdown && filteredArtists.length > 0"
+                class="artist-dropdown">
+                <div
+                  *ngFor="let artist of filteredArtists"
+                  class="artist-dropdown-item"
+                  (mousedown)="selectArtistFromDropdown(artist)">
+                  <i class="bi bi-person-circle me-2"></i>
+                  {{ artist.name }}
+                  <span *ngIf="artist.isBand" class="badge bg-secondary ms-2">Band</span>
+                </div>
+              </div>
+
+              <div
+                *ngIf="showArtistDropdown && filteredArtists.length === 0 && artistSearchTerm.length > 0"
+                class="artist-dropdown">
+                <div class="artist-dropdown-item text-muted">
+                  <i class="bi bi-info-circle me-2"></i>
+                  Keine Künstler gefunden
+                </div>
+              </div>
+            </div>
+
+            <div class="form-text mb-3">
+              Geben Sie einen Namen ein, um Künstler zu suchen
+            </div>
+
+            <div *ngIf="selectedArtists.length > 0" class="selected-artists-container">
+              <strong class="d-block mb-2">Ausgewählte Künstler ({{ selectedArtists.length }}):</strong>
+              <div class="d-flex flex-wrap gap-2">
+                <span
+                  *ngFor="let artist of selectedArtists"
+                  class="badge bg-primary artist-chip">
+                  <i class="bi bi-person-fill me-1"></i>
+                  {{ artist.name }}
+                  <i
+                    class="bi bi-x-circle ms-2 artist-chip-remove"
+                    (click)="removeArtist(artist)"
+                    title="Entfernen"></i>
+                </span>
+              </div>
+            </div>
+
+            <div *ngIf="selectedArtists.length === 0" class="text-muted fst-italic">
+              Noch keine Künstler ausgewählt
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="description" class="form-label fw-bold">
+              Beschreibung (optional)
+            </label>
+            <textarea
+              class="form-control"
+              id="description"
+              formControlName="description"
+              rows="6"
+              maxlength="800"
+              placeholder="Beschreiben Sie die Veranstaltung...">
+            </textarea>
+
+            @if (eventForm.controls.description.touched && eventForm.controls.description.errors) {
+              <small class="text-danger">
+                @if (eventForm.controls.description.errors.maxlength) {
+                  Beschreibung darf maximal 800 Zeichen lang sein.
+                }
+              </small>
+            }
+
+            <div class="form-text">
+              {{ eventForm.value.description?.length || 0 }}/800 Zeichen
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mt-5 pt-3 border-top">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isLoading || eventForm.invalid">
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Wird erstellt...
+              </span>
+              <span *ngIf="!isLoading">
+                <i class="bi bi-plus-circle"></i> Veranstaltung erstellen
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>

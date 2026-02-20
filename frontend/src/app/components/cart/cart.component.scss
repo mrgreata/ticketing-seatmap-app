@@ -1,0 +1,127 @@
+.cart-page {
+  .cart-item-card {
+    border-radius: 14px;
+  }
+
+  .flex-grow-1 {
+    min-width: 0;
+  }
+
+  .d-flex.justify-content-between.gap-3 {
+    min-width: 0;
+  }
+
+  .d-flex.justify-content-between.gap-3 > div:first-child {
+    min-width: 0;
+  }
+
+  .item-image {
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f6f6f6;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  .placeholder-box {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #6c757d;
+    background: #f6f6f6;
+
+    &.dark {
+      background: #111;
+      color: #fff;
+    }
+  }
+
+  .item-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.2;
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    min-width: 0;
+  }
+
+  .item-title-text {
+    display: block;
+    min-width: 0;
+    flex: 1 1 auto;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .item-meta {
+    margin-top: 0.25rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+
+  .item-price {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .qty-select {
+    width: 92px;
+  }
+
+  .summary-card {
+    top: 90px;
+    border-radius: 14px;
+  }
+
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    color: #495057;
+    margin: 0.35rem 0;
+  }
+
+  .summary-total {
+    font-size: 1.35rem;
+    font-weight: 800;
+  }
+}
+
+.btn-event-primary {
+  background-color: #C0D3DF;
+  color: #000;
+  border: none;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 14px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-event-primary:hover {
+  background-color: #a8c1d1;
+  color: #000;
+}
+
+.btn-event-primary:disabled {
+  background-color: #e3e8ec;
+  color: #777;
+  cursor: not-allowed;
+}

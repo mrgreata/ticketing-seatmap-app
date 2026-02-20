@@ -1,0 +1,475 @@
+<main class="container mt-5">
+  <div class="text-center mb-4">
+    <h1 class="fw-bold">Veranstaltungen</h1>
+  </div>
+
+  <div class="search-mode-selector mb-4">
+    <div class="placeholder-left"></div>
+
+    <div class="mode-buttons-group">
+      <button
+        [class.active]="searchMode === 'event'"
+        (click)="setSearchMode('event')"
+        class="mode-btn">
+        Veranstaltung
+      </button>
+      <button
+        [class.active]="searchMode === 'artist'"
+        (click)="setSearchMode('artist')"
+        class="mode-btn">
+        Künstler
+      </button>
+      <button
+        [class.active]="searchMode === 'location'"
+        (click)="setSearchMode('location')"
+        class="mode-btn">
+        Ort
+      </button>
+    </div>
+
+    <div class="placeholder-right">
+      <button
+        *ngIf="isAdmin()"
+        class="btn-admin-create"
+        (click)="navigateToCreateEvent()">
+        <i class="bi bi-plus-circle"></i>
+        Neue Veranstaltung erstellen
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-section mb-4" *ngIf="searchMode === 'event'">
+    <div class="search-row">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nach Veranstaltung suchen..."
+        [(ngModel)]="searchTitle"
+        maxlength="255"
+        (keyup.enter)="onSearch()"
+      />
+      <button class="btn-toggle" (click)="toggleFilters()">
+        Filter
+        <i class="bi" [ngClass]="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
+    </div>
+
+    <div class="filter-row" *ngIf="showFilters">
+      <div class="date-input-wrapper">
+        <label class="input-label">Veranstaltungstyp</label>
+        <select class="form-control" [(ngModel)]="searchType">
+          <option value="">Alle Typen</option>
+          <option *ngFor="let type of eventTypes" [value]="type">{{ type }}</option>
+        </select>
+        <small class="validation-error">&nbsp;</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">Von Datum</label>
+        <input
+          type="date"
+          class="form-control"
+          [(ngModel)]="searchDateFrom"
+          [min]="getTodayDate()"
+          (change)="validateDates()"
+        />
+        <small class="validation-error">&nbsp;</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">Bis Datum</label>
+        <input
+          type="date"
+          class="form-control"
+          [(ngModel)]="searchDateTo"
+          [min]="searchDateFrom || getTodayDate()"
+          (change)="validateDates()"
+        />
+        <small class="validation-error">{{ dateError || '&nbsp;' }}</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">Dauer (in Min, ±30 Min)</label>
+        <input
+          type="number"
+          class="form-control"
+          placeholder="60"
+          [(ngModel)]="searchDuration"
+          min="1"
+          max="9999"
+          step="1"
+          (keydown)="preventNonNumeric($event)"
+          (ngModelChange)="validateDuration()"
+          oninput="if(this.value.length > 4) this.value = this.value.slice(0, 4);"
+        />
+        <small class="validation-error">&nbsp;</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">Min Preis (in €)</label>
+        <input
+          type="number"
+          class="form-control"
+          placeholder="10"
+          [(ngModel)]="searchPriceMin"
+          min="0"
+          max="99999"
+          step="0.01"
+          (keydown)="preventNonNumericPrice($event)"
+          (input)="limitPriceValue($event, 'min')"
+          (ngModelChange)="validatePrices()"
+        />
+        <small class="validation-error">&nbsp;</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">Max Preis (in €)</label>
+        <input
+          type="number"
+          class="form-control"
+          placeholder="100"
+          [(ngModel)]="searchPriceMax"
+          min="0"
+          max="99999"
+          step="0.01"
+          (keydown)="preventNonNumericPrice($event)"
+          (input)="limitPriceValue($event, 'max')"
+          (ngModelChange)="validatePrices()"
+        />
+        <small class="validation-error">{{ priceError || '&nbsp;' }}</small>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="btn btn-primary" (click)="onSearch()">Suchen</button>
+      <button class="btn btn-secondary" (click)="onReset()">Zurücksetzen</button>
+    </div>
+  </div>
+
+  <div class="filter-section mb-4" *ngIf="searchMode === 'artist'">
+    <div class="search-row">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nach Künstler suchen..."
+        [(ngModel)]="searchArtistName"
+        maxlength="255"
+        (keyup.enter)="onSearch()"
+      />
+    </div>
+
+    <div class="button-row">
+      <button class="btn btn-primary" (click)="onSearch()">Suchen</button>
+      <button class="btn btn-secondary" (click)="onReset()">Zurücksetzen</button>
+    </div>
+  </div>
+
+  @if (isAdmin()) {
+    <div class="alert alert-info mt-3">
+      Admins können keine Tickets für Veranstaltungen kaufen.
+    </div>
+  }
+
+  <div *ngIf="searchMode === 'artist' && groupedArtists.length > 0 && hasSearchedArtists" class="results-list mb-4">
+    <div class="results-header">
+      <h5>Gefundene Künstler/Bands</h5>
+      <button class="btn-collapse" (click)="toggleArtistResults()">
+        <i class="bi" [ngClass]="artistResultsCollapsed ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
+        {{ artistResultsCollapsed ? 'Einblenden' : 'Ausblenden' }}
+      </button>
+    </div>
+
+    <div class="results-content"
+         [class.collapsed]="artistResultsCollapsed"
+         [class.expanded]="!artistResultsCollapsed">
+      <ng-container *ngFor="let group of groupedArtists">
+        <div
+          class="result-item"
+          [class.selected]="selectedArtist?.id === group.artist.id"
+          (click)="selectArtist(group.artist)">
+          <i class="bi bi-person-circle"></i>
+          <div style="flex: 1;">
+            <strong>{{ group.artist.name }}</strong>
+            <span *ngIf="group.artist.isBand" class="badge band-badge">Band</span>
+            <span *ngIf="!group.artist.isBand" class="badge person-badge">Künstler</span>
+          </div>
+          <i class="bi bi-chevron-right ms-auto"></i>
+        </div>
+
+        <div *ngFor="let band of group.bands"
+             class="result-item result-item-nested"
+             [class.selected]="selectedArtist?.id === band.id"
+             (click)="selectArtist(band)">
+          <i class="bi bi-arrow-return-right"></i>
+          <i class="bi bi-people-fill"></i>
+          <div style="flex: 1;">
+            <strong>{{ band.name }}</strong>
+            <span class="badge band-badge">Band</span>
+          </div>
+          <i class="bi bi-chevron-right ms-auto"></i>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <div *ngIf="searchMode === 'artist' && groupedArtists.length > 0 && !hasSearchedArtists"
+       class="results-content-plain mb-4">
+    <ng-container *ngFor="let group of groupedArtists">
+      <div
+        class="result-item"
+        [class.selected]="selectedArtist?.id === group.artist.id"
+        (click)="selectArtist(group.artist)">
+        <i class="bi bi-person-circle"></i>
+        <div style="flex: 1;">
+          <strong>{{ group.artist.name }}</strong>
+          <span *ngIf="group.artist.isBand" class="badge band-badge">Band</span>
+          <span *ngIf="!group.artist.isBand" class="badge person-badge">Künstler</span>
+        </div>
+        <i class="bi bi-chevron-right ms-auto"></i>
+      </div>
+
+      <div *ngFor="let band of group.bands"
+           class="result-item result-item-nested"
+           [class.selected]="selectedArtist?.id === band.id"
+           (click)="selectArtist(band)">
+        <i class="bi bi-arrow-return-right"></i>
+        <i class="bi bi-people-fill"></i>
+        <div style="flex: 1;">
+          <strong>{{ band.name }}</strong>
+          <span class="badge band-badge">Band</span>
+        </div>
+        <i class="bi bi-chevron-right ms-auto"></i>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="filter-section mb-4" *ngIf="searchMode === 'location'">
+    <div class="search-row">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nach Bezeichnung suchen..."
+        [(ngModel)]="searchLocationName"
+        maxlength="255"
+        (keyup.enter)="onSearch()"
+      />
+      <button class="btn-toggle" (click)="toggleFilters()">
+        Filter
+        <i class="bi" [ngClass]="showFilters ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+      </button>
+    </div>
+
+    <div class="filter-row" *ngIf="showFilters">
+      <div class="date-input-wrapper">
+        <label class="input-label">Straße</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Landstraßer Hauptstraße 30"
+          [(ngModel)]="searchLocationStreet"
+          maxlength="255"
+        />
+        <small class="validation-error">&nbsp;</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">Stadt</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Wien"
+          [(ngModel)]="searchLocationCity"
+          maxlength="255"
+        />
+        <small class="validation-error">&nbsp;</small>
+      </div>
+
+      <div class="date-input-wrapper">
+        <label class="input-label">PLZ</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="1030"
+          [(ngModel)]="searchLocationZip"
+          maxlength="4"
+          pattern="[0-9]*"
+          (keydown)="preventNonNumericPrice($event)"
+          (input)="validateZip()"
+        />
+        <small class="validation-error">{{ zipError || '&nbsp;' }}</small>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="btn btn-primary" (click)="onSearch()">Suchen</button>
+      <button class="btn btn-secondary" (click)="onReset()">Zurücksetzen</button>
+    </div>
+  </div>
+
+  <div *ngIf="searchMode === 'location' && locations.length > 0 && hasSearchedLocations" class="results-list mb-4">
+    <div class="results-header">
+      <h5>Gefundene Aufführungsorte</h5>
+      <button class="btn-collapse" (click)="toggleLocationResults()">
+        <i class="bi" [ngClass]="locationResultsCollapsed ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
+        {{ locationResultsCollapsed ? 'Einblenden' : 'Ausblenden' }}
+      </button>
+    </div>
+
+    <div class="results-content"
+         [class.collapsed]="locationResultsCollapsed"
+         [class.expanded]="!locationResultsCollapsed">
+      <div class="result-item"
+           *ngFor="let location of locations"
+           [class.selected]="selectedLocation?.id === location.id"
+           (click)="selectLocation(location)">
+        <i class="bi bi-geo-alt"></i>
+        <div class="location-details">
+          <strong>{{ location.name }}</strong>
+          <span>{{ location.street }} {{ location.streetNumber }}, {{ location.zipCode }} {{ location.city }}</span>
+        </div>
+        <i class="bi bi-chevron-right ms-auto"></i>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="searchMode === 'location' && locations.length > 0 && !hasSearchedLocations"
+       class="results-content-plain mb-4">
+    <div class="result-item"
+         *ngFor="let location of locations"
+         [class.selected]="selectedLocation?.id === location.id"
+         (click)="selectLocation(location)">
+      <i class="bi bi-geo-alt"></i>
+      <div class="location-details">
+        <strong>{{ location.name }}</strong>
+        <span>{{ location.street }} {{ location.streetNumber }}, {{ location.zipCode }} {{ location.city }}</span>
+      </div>
+      <i class="bi bi-chevron-right ms-auto"></i>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Laden...</span>
+    </div>
+  </div>
+
+  <section *ngIf="!isLoading && events.length > 0">
+    <div *ngIf="selectedArtist && events.length > 0" class="alert alert-info mb-3">
+      Veranstaltungen von: <strong>{{ selectedArtist.name }}</strong>
+    </div>
+
+    <div *ngIf="selectedLocation && events.length > 0" class="alert alert-info mb-3">
+      Veranstaltungen in: <strong>{{ selectedLocation.name }}</strong>
+      ({{ selectedLocation.street }} {{ selectedLocation.streetNumber }},
+      {{ selectedLocation.zipCode }} {{ selectedLocation.city }})
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-3" *ngFor="let event of events">
+        <div class="event-card">
+          <div class="event-card-header">
+            <div class="event-card-header-content">
+              <div class="event-card-date">
+                <div class="event-card-month">{{ getMonth(event.dateTime) }}</div>
+                <div class="event-card-day">{{ getDay(event.dateTime) }}</div>
+              </div>
+              <div class="event-card-title-wrapper">
+                <div class="event-card-title">{{ event.title }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-card-divider-wrapper">
+            <div class="event-card-divider"></div>
+          </div>
+
+          <div class="event-card-image-wrapper">
+            <img
+              class="event-card-image"
+              [src]="getEventImageUrl(event)"
+              [alt]="event.title"
+            />
+          </div>
+
+          <div class="event-card-details">
+            <div class="event-card-details-text">
+              {{ event.type }} | {{ event.durationMinutes }} Min | {{ formatDate(event.dateTime) }}<br>
+              <span class="location-full">
+                {{ event.locationName }}<span *ngIf="event.locationCity">, {{ event.locationCity }}</span>
+              </span>
+            </div>
+
+            <div class="event-description-divider"></div>
+
+            <div class="event-description" *ngIf="event.description; else noDescription">
+              {{ event.description.length > 80 ? (event.description.substring(0, 80) + '...') : event.description }}
+            </div>
+
+            <ng-template #noDescription>
+              <div class="event-description event-description-empty">
+                <span class="text-muted">Keine Beschreibung verfügbar</span>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="event-card-footer">
+            <div class="event-card-admin-actions-footer">
+              <ng-container *ngIf="isAdmin()">
+                <i class="bi bi-pencil admin-icon admin-icon-edit"
+                   (click)="editEvent(event.id, $event)"
+                   title="Bearbeiten"></i>
+                <i class="bi bi-trash admin-icon admin-icon-delete"
+                   data-bs-toggle="modal"
+                   [attr.data-bs-target]="'#delete-event-' + event.id"
+                   (click)="$event.stopPropagation(); $event.preventDefault()"
+                   title="Löschen"></i>
+              </ng-container>
+            </div>
+
+            <div class="event-card-actions">
+              <div class="event-price" *ngIf="event.minPrice">
+                <span class="price-label">ab</span>
+                <span class="price-value">{{ (event.minPrice / 100) | number:'1.2-2' }}€</span>
+              </div>
+
+              <a [routerLink]="['/events', event.id]" class="event-card-button">
+                <span class="event-card-button-text">Details</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="!isLoading && events.length > 0 && hasMoreEvents" class="text-center my-4">
+    <button
+      class="btn-load-more"
+      (click)="loadMoreEvents()"
+      [disabled]="isLoadingMore">
+      <span *ngIf="!isLoadingMore">Weitere Veranstaltungen laden</span>
+      <span *ngIf="isLoadingMore">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Laden...
+      </span>
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && events.length === 0 && errorMessage"
+       class="alert alert-info text-center">
+    <i class="bi bi-info-circle me-2"></i>
+    {{ errorMessage }}
+  </div>
+</main>
+
+<ng-container *ngFor="let event of events">
+  <app-confirm-dialog
+    [id]="'delete-event-' + event.id"
+    title="Veranstaltung löschen"
+    [message]="'Möchten Sie die Veranstaltung ' + (event.title.length > 30 ? (event.title.substring(0, 25) + '...') : event.title) + ' wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'"
+    confirmText="Ja, löschen"
+    cancelText="Abbrechen"
+    confirmButtonClass="btn-danger"
+    (confirm)="deleteEvent(event.id)">
+  </app-confirm-dialog>
+</ng-container>

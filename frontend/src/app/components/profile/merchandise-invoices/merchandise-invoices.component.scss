@@ -1,0 +1,38 @@
+.ticket-card {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.ticket-top {
+  background: black;
+  color: white;
+  font-weight: bold;
+}
+
+.ticket-select input[type="checkbox"] {
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid black;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticket-select input[type="checkbox"]:checked {
+  background: black;
+}
+.ticket-select input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+.ticket-actions {
+  margin-left: 4px;
+}

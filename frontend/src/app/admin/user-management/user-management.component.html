@@ -1,0 +1,304 @@
+<!-- HEADER -->
+<div class="user-page-header mb-5">
+
+  <!-- TOGGLE -->
+  <div class="d-flex justify-content-center mb-3">
+    <div class="btn-group" role="group" aria-label="Benutzerfilter">
+      <button
+        type="button"
+        class="btn"
+        [ngClass]="!showLockedUsers ? 'btn-primary active' : 'btn-outline-primary'"
+        (click)="toggleLockedUsers(false)">
+        Aktive Benutzer
+      </button>
+
+      <button
+        type="button"
+        class="btn"
+        [ngClass]="showLockedUsers ? 'btn-primary active' : 'btn-outline-primary'"
+        (click)="toggleLockedUsers(true)">
+        Gesperrte Benutzer
+      </button>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <h2 class="text-center mb-3 user-title">
+    {{ showLockedUsers ? 'Gesperrte Benutzer' : 'Aktive Benutzer' }}
+  </h2>
+
+  <!-- SEARCH -->
+  <div class="d-flex justify-content-left">
+    <div class="search-pill">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Name oder E-Mail suchen"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+        maxlength="50"
+      />
+    </div>
+  </div>
+
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading" class="text-center my-4">
+  <div class="spinner-border" role="status"></div>
+</div>
+
+<!-- NO RESULTS -->
+<div *ngIf="!loading && users.length === 0" class="alert alert-info">
+  Keine Benutzer gefunden.
+</div>
+
+<!-- TABLE -->
+<table
+  *ngIf="!loading && users.length > 0"
+  class="table">
+
+  <thead>
+  <tr>
+    <th>Email</th>
+    <th>Vorname</th>
+    <th>Nachname</th>
+    <th>Rolle</th>
+    <th>Aktionen</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr
+    *ngFor="let user of sortAdminsFirst(users)"
+    [ngClass]="{ 'current-user-row': isCurrentUser(user) }"
+  >
+    <td>
+      {{ user.email }}
+      <span
+        *ngIf="isCurrentUser(user)"
+        class="badge bg-info text-dark ms-2"
+        title="Das sind Sie">
+        Sie
+      </span>
+    </td>
+
+    <td>{{ user.firstName }}</td>
+    <td>{{ user.lastName }}</td>
+
+    <td>
+      <span
+        class="badge"
+        [ngClass]="user.userRole === 'ROLE_ADMIN' ? 'bg-primary' : 'bg-secondary'">
+        {{ user.userRole === 'ROLE_ADMIN' ? 'Administrator' : 'Benutzer' }}
+      </span>
+    </td>
+
+    <td class="d-flex gap-2 flex-wrap">
+
+      <!-- ===================== -->
+      <!-- LOCKED USER -->
+      <!-- ===================== -->
+      <ng-container *ngIf="showLockedUsers">
+
+        <button
+          class="btn btn-warning btn-sm"
+          data-bs-toggle="modal"
+          [attr.data-bs-target]="'#unlock-user-' + user.id">
+          Entsperren
+        </button>
+
+        <app-confirm-dialog
+          [id]="'unlock-user-' + user.id"
+          title="Benutzer entsperren"
+          [message]="'Möchten Sie den Benutzer ' + user.email + ' wirklich entsperren?'"
+          confirmText="Entsperren"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-warning"
+          (confirm)="unlock(user.id)">
+        </app-confirm-dialog>
+
+        <button
+          class="btn btn-outline-primary btn-sm"
+          data-bs-toggle="modal"
+          [attr.data-bs-target]="'#change-role-locked-' + user.id">
+          {{ user.userRole === 'ROLE_ADMIN'
+          ? 'Zu Benutzer herabstufen'
+          : 'Zu Administrator hochstufen' }}
+        </button>
+
+        <app-confirm-dialog
+          [id]="'change-role-locked-' + user.id"
+          title="Benutzerrolle ändern"
+          [message]="
+            user.userRole === 'ROLE_ADMIN'
+              ? 'Möchten Sie den Administrator ' + user.email + ' wirklich zu einem normalen Benutzer herabstufen?'
+              : 'Möchten Sie den Benutzer ' + user.email + ' wirklich zum Administrator hochstufen?'
+          "
+          [confirmText]="user.userRole === 'ROLE_ADMIN' ? 'Herabstufen' : 'Hochstufen'"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-primary"
+          (confirm)="toggleRole(user)">
+        </app-confirm-dialog>
+
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          data-bs-toggle="modal"
+          [attr.data-bs-target]="'#reset-password-locked-' + user.id">
+          Passwort zurücksetzen
+        </button>
+
+        <app-confirm-dialog
+          [id]="'reset-password-locked-' + user.id"
+          title="Passwort zurücksetzen"
+          [message]="'Soll für den gesperrten Benutzer ' + user.email
+            + ' ein Passwort-Reset ausgelöst werden? Sobald er sein Passwort geändert hat, wird er automatisch entsperrt.'"
+          confirmText="Passwort zurücksetzen und entsperren"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-outline-secondary"
+          (confirm)="triggerPasswordReset(user.id)">
+        </app-confirm-dialog>
+
+      </ng-container>
+
+      <!-- ===================== -->
+      <!-- ACTIVE USER -->
+      <!-- ===================== -->
+      <ng-container *ngIf="!showLockedUsers">
+
+        <button
+          class="btn btn-sm"
+          [ngClass]="
+            isLastActiveAdmin(user) || isCurrentUser(user)
+              ? 'btn-outline-secondary disabled-action'
+              : 'btn-danger'"
+          [disabled]="isLastActiveAdmin(user) || isCurrentUser(user)"
+          data-bs-toggle="modal"
+          [attr.data-bs-target]="'#lock-user-' + user.id">
+          Sperren
+        </button>
+
+        <app-confirm-dialog
+          [id]="'lock-user-' + user.id"
+          title="Benutzer sperren"
+          [message]="'Möchten Sie den Benutzer ' + user.email + ' wirklich sperren?'"
+          confirmText="Sperren"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-danger"
+          (confirm)="lock(user.id)">
+        </app-confirm-dialog>
+
+        <button
+          class="btn btn-sm"
+          [ngClass]="isLastActiveAdmin(user)
+            ? 'btn-outline-secondary disabled-action'
+            : 'btn-danger'"
+          [disabled]="isLastActiveAdmin(user)"
+          data-bs-toggle="modal"
+          [attr.data-bs-target]="
+            isCurrentUser(user) && user.userRole === 'ROLE_ADMIN'
+              ? '#self-role-warning-' + user.id
+              : '#change-role-active-' + user.id
+          ">
+          {{ user.userRole === 'ROLE_ADMIN'
+          ? 'Zu Benutzer herabstufen'
+          : 'Zu Administrator hochstufen' }}
+        </button>
+
+        <app-confirm-dialog
+          *ngIf="!(isCurrentUser(user) && user.userRole === 'ROLE_ADMIN')"
+          [id]="'change-role-active-' + user.id"
+          title="Benutzerrolle ändern"
+          [message]="
+            user.userRole === 'ROLE_ADMIN'
+              ? 'Möchten Sie den Administrator ' + user.email + ' wirklich zu einem normalen Benutzer herabstufen?'
+              : 'Möchten Sie den Benutzer ' + user.email + ' wirklich zum Administrator hochstufen?'
+          "
+          [confirmText]="user.userRole === 'ROLE_ADMIN' ? 'Herabstufen' : 'Hochstufen'"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-primary"
+          (confirm)="toggleRole(user)">
+        </app-confirm-dialog>
+
+        <app-confirm-dialog
+          *ngIf="isCurrentUser(user) && user.userRole === 'ROLE_ADMIN'"
+          [id]="'self-role-warning-' + user.id"
+          title="Administratorrolle abgeben"
+          message="Sie sind dabei, Ihre eigene Administratorrolle zu entfernen."
+          confirmText="Weiter"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-warning"
+          (confirm)="openFinalSelfDowngrade(user.id)">
+        </app-confirm-dialog>
+
+        <app-confirm-dialog
+          *ngIf="isCurrentUser(user) && user.userRole === 'ROLE_ADMIN'"
+          [id]="'self-role-final-' + user.id"
+          title="Letzte Bestätigung"
+          message="⚠️ Sie verlieren sofort alle Administratorrechte und werden automatisch ausgeloggt."
+          confirmText="Ja, Rolle ändern und abmelden"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-danger"
+          (confirm)="toggleRole(user)">
+        </app-confirm-dialog>
+
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          data-bs-toggle="modal"
+          [attr.data-bs-target]="'#reset-password-active-' + user.id">
+          Passwort zurücksetzen
+        </button>
+
+        <app-confirm-dialog
+          [id]="'reset-password-active-' + user.id"
+          title="Passwort zurücksetzen"
+          [message]="'Soll für den Benutzer ' + user.email
+            + ' ein Passwort-Reset ausgelöst werden?'"
+          confirmText="Passwort zurücksetzen"
+          cancelText="Abbrechen"
+          confirmButtonClass="btn-outline-secondary"
+          (confirm)="triggerPasswordReset(user.id)">
+        </app-confirm-dialog>
+
+      </ng-container>
+
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- PAGINATION -->
+<nav *ngIf="totalElements > pageSize" class="mt-4">
+  <ul class="pagination justify-content-center align-items-center gap-2">
+
+    <!-- PREVIOUS (placeholder when disabled) -->
+    <li class="page-item">
+      <button
+        class="btn btn-outline-primary pagination-btn"
+        [class.invisible]="page === 0"
+        [disabled]="page === 0"
+        (click)="goToPage(page - 1)">
+        ← Zurück
+      </button>
+    </li>
+
+    <!-- CURRENT PAGE (ALWAYS CENTERED) -->
+    <li class="page-item">
+      <span class="badge bg-light text-dark px-3 py-2 pagination-label">
+        Seite {{ page + 1 }} von {{ totalPages }}
+      </span>
+    </li>
+
+    <!-- NEXT (placeholder when disabled) -->
+    <li class="page-item">
+      <button
+        class="btn btn-primary pagination-btn"
+        [class.invisible]="page >= totalPages - 1"
+        [disabled]="page >= totalPages - 1"
+        (click)="goToPage(page + 1)">
+        Weiter →
+      </button>
+    </li>
+
+  </ul>
+</nav>
