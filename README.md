@@ -18,6 +18,9 @@ This project demonstrates full-stack engineering skills: complex algorithmic sea
 ### 📰 News & Events Overview
 ![News](./news.png)
 
+### 📊 Data & Analytics
+![News](./data.png)
+
 ### 🪑 Seatmap Overview
 ![Seatmap](./seatmap.png)
 
@@ -25,7 +28,7 @@ This project demonstrates full-stack engineering skills: complex algorithmic sea
 ![Seat Chosen](./seatmap_chosen.png)
 
 ### 🎟 Tickets Screen
-![Tickets](./Tickets.png)
+![Tickets](./tickets.png)
 
 ---
 
