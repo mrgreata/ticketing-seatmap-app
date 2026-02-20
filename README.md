@@ -1,6 +1,6 @@
 # 🎭 Event Seatmap Platform
 
-A full-featured **event ticketing and dynamic seatmap management platform** built with **Angular**, **Spring Boot**, and **Java** as part of the **TU Wien – Software Engineering & Project (SEPR)** course.
+A full-featured **event ticketing and dynamic seatmap management platform** built with **Angular**, **Spring Boot**, and **Java**.
 
 This project demonstrates full-stack engineering skills: complex algorithmic seatmap generation, REST backend architecture, Angular component design, database modeling, and clean CI-ready project structure.
 
@@ -8,17 +8,24 @@ This project demonstrates full-stack engineering skills: complex algorithmic sea
 
 ## 📸 Showcase
 
+
+### 🏁 Start Screen
+![Main](./main.png)
+
 ### 🔐 Login Screen
 ![Login](./Login.png)
 
-### 🏟 Main Event View
-![Main](./main.png)
+### 📰 News & Events Overview
+![News](./news.png)
 
 ### 🪑 Seatmap Overview
 ![Seatmap](./seatmap.png)
 
 ### 🎯 Selected Seats Example
 ![Seat Chosen](./seatmap_chosen.png)
+
+### 🎟 Tickets Screen
+![Tickets](./Tickets.png)
 
 ---
 
